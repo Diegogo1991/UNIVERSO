@@ -1,0 +1,16 @@
+{
+  "galaxy": "Sistema Estelar",
+  "stars": [
+    { "count": 4500, "spread": 1400, "size": 0.7, "color": "#ffffff" },
+    { "count": 3600, "spread": 1200, "size": 0.55, "color": "#ffdfba" },
+    { "count": 2700, "spread": 1000, "size": 0.5, "color": "#ff9d80" },
+    { "count": 2400, "spread": 900, "size": 0.45, "color": "#aaddff" },
+    { "count": 1800, "spread": 800, "size": 0.4, "color": "#ddddff" },
+    { "count": 1500, "spread": 700, "size": 0.35, "color": "#ff99ff" },
+    { "count": 1200, "spread": 1500, "size": 0.25, "color": "#ffff99" },
+    { "count": 1000, "spread": 1300, "size": 0.2, "color": "#99ffff" },
+    { "count": 800, "spread": 1100, "size": 0.15, "color": "#ff99cc" },
+    { "count": 2000, "spread": 600, "size": 0.3, "color": "#ffccff" }
+  ],
+  "planets": []
+}

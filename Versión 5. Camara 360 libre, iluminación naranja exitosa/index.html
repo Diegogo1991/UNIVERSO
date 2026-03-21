@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Diego Giraldo — Portfolio 3D</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; }
+  canvas { display: block; }
+
+  /* ── HUD ── */
+  #hud {
+    position: fixed; top: 20px; left: 20px;
+    color: rgba(120,200,255,0.7); font-size: 11px;
+    line-height: 2; letter-spacing: 1px;
+    pointer-events: none; z-index: 5;
+  }
+  #hud .label { color: rgba(120,200,255,0.35); }
+  #hud .title { font-size: 13px; font-weight: bold; color: rgba(140,210,255,0.9); letter-spacing: 3px; margin-bottom: 8px; }
+  @media (max-width: 600px) { #hud { display: none; } }
+
+  /* ── PLANET HINT ── */
+  #planet-hint {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    color: rgba(100,200,255,0.6); font-size: 10px; letter-spacing: 3px;
+    pointer-events: none; z-index: 5; opacity: 0; transition: opacity 0.5s;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  /* ── INTERACT PROMPT ── */
+  #interact-prompt {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    opacity: 0; transition: opacity 0.4s; pointer-events: none; z-index: 5; text-align: center;
+  }
+  #interact-box {
+    background: rgba(4,8,28,0.88); border: 1px solid rgba(80,160,255,0.3);
+    border-radius: 12px; padding: 14px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .interact-label { color: rgba(140,210,255,0.9); font-size: 12px; letter-spacing: 3px; }
+  .interact-key   { color: rgba(100,180,255,0.5); font-size: 10px; letter-spacing: 2px; }
+
+  /* ── SPEED BAR ── */
+  #speed-bar {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 4px; pointer-events: none; z-index: 5;
+  }
+  #speed-label { color: rgba(100,200,255,0.35); font-size: 9px; letter-spacing: 2px; }
+  #speed-track { width: 80px; height: 3px; background: rgba(100,200,255,0.1); border-radius: 2px; overflow: hidden; }
+  #speed-fill  { height: 100%; width: 0%; background: rgba(100,200,255,0.7); transition: width 0.1s; border-radius: 2px; }
+
+  /* ── JOYSTICK ── */
+  #joystick-wrap {
+    position: fixed; bottom: 36px; left: 36px;
+    z-index: 10; display: none;
+  }
+  @media (max-width: 900px) { #joystick-wrap { display: block; } }
+
+  #joystick {
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(10,20,60,0.55);
+    border: 1px solid rgba(80,160,255,0.25);
+    position: relative; touch-action: none;
+  }
+  #joystick-knob {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(60,130,255,0.35);
+    border: 1px solid rgba(100,180,255,0.5);
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s;
+    pointer-events: none;
+  }
+  #joystick-label {
+    text-align: center; margin-top: 6px;
+    color: rgba(100,180,255,0.3); font-size: 9px; letter-spacing: 2px;
+  }
+
+  /* ── BOTÓN E MÓVIL ── */
+  #btn-e {
+    position: fixed; bottom: 36px; right: 36px;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(10,20,60,0.6); border: 1px solid rgba(80,160,255,0.3);
+    color: rgba(100,200,255,0.8); font-size: 11px; letter-spacing: 1px;
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 2px; z-index: 10;
+    touch-action: none; cursor: pointer;
+  }
+  #btn-e span { font-size: 9px; color: rgba(100,180,255,0.4); letter-spacing: 1px; }
+  @media (max-width: 900px) { #btn-e { display: flex; } }
+
+  /* ── MOUSE DRAG CURSOR ── */
+  canvas { cursor: grab; }
+  canvas:active { cursor: grabbing; }
+
+  /* ── CV OVERLAY ── */
+  #cv-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,10,0.88); z-index: 20;
+  }
+  #cv-overlay.active { display: flex; }
+  #cv-card {
+    background: linear-gradient(145deg, rgba(4,8,28,0.98), rgba(8,16,48,0.98));
+    border: 1px solid rgba(80,160,255,0.25); border-radius: 20px;
+    padding: 44px 52px; max-width: 560px; width: 92%; color: #d8eeff;
+    position: relative; animation: floatCard 4s ease-in-out infinite;
+    box-shadow: 0 0 80px rgba(40,100,255,0.15);
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .cv-corner { position: absolute; width: 18px; height: 18px; border-color: rgba(80,160,255,0.4); border-style: solid; }
+  .cv-corner.tl { top: 14px; left: 14px; border-width: 1px 0 0 1px; }
+  .cv-corner.tr { top: 14px; right: 14px; border-width: 1px 1px 0 0; }
+  .cv-corner.bl { bottom: 14px; left: 14px; border-width: 0 0 1px 1px; }
+  .cv-corner.br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+  #close-btn {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4); width: 30px; height: 30px;
+    border-radius: 50%; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  #close-btn:hover { background: rgba(255,50,50,0.15); color: #fff; }
+  .cv-name { font-size: 24px; font-weight: 700; letter-spacing: 3px; color: #fff; margin-bottom: 6px; }
+  .cv-subtitle {
+    font-size: 10px; letter-spacing: 3px; color: rgba(100,180,255,0.6);
+    text-transform: uppercase; margin-bottom: 28px;
+    padding-bottom: 20px; border-bottom: 1px solid rgba(80,140,255,0.12); line-height: 1.8;
+  }
+  .cv-section { margin-bottom: 22px; }
+  .cv-section-title { font-size: 9px; letter-spacing: 4px; color: rgba(100,180,255,0.35); text-transform: uppercase; margin-bottom: 10px; }
+  .skill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-tag {
+    background: rgba(40,100,255,0.1); border: 1px solid rgba(60,130,255,0.2);
+    border-radius: 20px; padding: 5px 14px; font-size: 11px; color: rgba(160,210,255,0.85);
+  }
+  .cv-role { display: flex; align-items: center; gap: 10px; font-size: 12px; color: rgba(150,205,255,0.7); margin-bottom: 8px; }
+  .cv-role::before { content: '▹'; color: rgba(80,160,255,0.5); font-size: 10px; }
+
+  /* ── LOADING ── */
+  #loading {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #00000f; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 100; transition: opacity 0.8s;
+  }
+  #loading.hidden { opacity: 0; pointer-events: none; }
+  #loading-name { color: rgba(120,200,255,0.9); font-size: 18px; letter-spacing: 6px; margin-bottom: 32px; }
+  #loading-bar-wrap { width: 200px; height: 2px; background: rgba(100,180,255,0.1); border-radius: 2px; overflow: hidden; }
+  #loading-bar { height: 100%; width: 0%; background: rgba(100,200,255,0.8); transition: width 0.3s; border-radius: 2px; }
+  #loading-text { margin-top: 16px; color: rgba(100,180,255,0.35); font-size: 10px; letter-spacing: 3px; }
+
+  /* ── TOUCH HINT ── */
+  #touch-hint {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    color: rgba(100,180,255,0.5); font-size: 10px; letter-spacing: 2px;
+    pointer-events: none; z-index: 5; display: none; text-align: center; line-height: 1.8;
+  }
+  @media (max-width: 900px) { #touch-hint { display: block; } }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div id="loading-name">DIEGO GIRALDO</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+  <div id="loading-text">CARGANDO UNIVERSO...</div>
+</div>
+
+<!-- HUD desktop -->
+<div id="hud">
+  <div class="title">// NAVE DG-01</div>
+  <span class="label">W / ↑</span> — impulso<br>
+  <span class="label">S / ↓</span> — freno<br>
+  <span class="label">A D / ← →</span> — rotar<br>
+  <span class="label">Q / E</span> — alabeo<br>
+  <span class="label">DRAG</span> — girar cámara<br>
+  <span class="label">CLICK PLANETA</span> — CV
+</div>
+
+<!-- Touch hint móvil -->
+<div id="touch-hint">
+  JOYSTICK ← mover &nbsp;|&nbsp; DRAG → → cámara
+</div>
+
+<div id="planet-hint">◈ PLANETA DETECTADO — HAZ CLICK ◈</div>
+
+<div id="interact-prompt">
+  <div id="interact-box">
+    <div class="interact-label">PLANETA I — PORTAFOLIO</div>
+    <div class="interact-key">[ E ] Ver portafolio</div>
+  </div>
+</div>
+
+<div id="speed-bar">
+  <div id="speed-label">VELOCIDAD</div>
+  <div id="speed-track"><div id="speed-fill"></div></div>
+</div>
+
+<!-- Joystick móvil -->
+<div id="joystick-wrap">
+  <div id="joystick">
+    <div id="joystick-knob"></div>
+  </div>
+  <div id="joystick-label">MOVER</div>
+</div>
+
+<!-- Botón E móvil -->
+<div id="btn-e">
+  E<span>INTERACTUAR</span>
+</div>
+
+<!-- CV OVERLAY -->
+<div id="cv-overlay">
+  <div id="cv-card">
+    <div class="cv-corner tl"></div><div class="cv-corner tr"></div>
+    <div class="cv-corner bl"></div><div class="cv-corner br"></div>
+    <button id="close-btn">✕</button>
+    <div class="cv-name">DIEGO GIRALDO</div>
+    <div class="cv-subtitle">Diseñador 3D &nbsp;·&nbsp; Productor Multimedia<br>Software Engineer</div>
+    <div class="cv-section">
+      <div class="cv-section-title">// Perfil</div>
+      <div class="cv-role">Creación de experiencias visuales 3D inmersivas</div>
+      <div class="cv-role">Producción multimedia integral — video, motion, web</div>
+      <div class="cv-role">Desarrollo de software y aplicaciones interactivas</div>
+    </div>
+    <div class="cv-section">
+      <div class="cv-section-title">// Stack & Habilidades</div>
+      <div class="skill-grid">
+        <span class="skill-tag">Blender 3D</span>
+        <span class="skill-tag">Three.js</span>
+        <span class="skill-tag">WebGL</span>
+        <span class="skill-tag">After Effects</span>
+        <span class="skill-tag">Premiere Pro</span>
+        <span class="skill-tag">Software Engineering</span>
+        <span class="skill-tag">3D Modeling</span>
+        <span class="skill-tag">Texturing & Shading</span>
+        <span class="skill-tag">Multimedia Production</span>
+        <span class="skill-tag">UI / UX Design</span>
+        <span class="skill-tag">Motion Graphics</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
