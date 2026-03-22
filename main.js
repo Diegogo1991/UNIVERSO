@@ -492,7 +492,7 @@ scene.add(envLight);
 scene.environment = envTexture;
 
 const loader = new THREE.GLTFLoader();
-loader.load('assets/nave.glb',
+loader.load('Assets/Nave.glb',
   (gltf) => {
     // First ship (original orange)
     shipModel = gltf.scene.clone();
