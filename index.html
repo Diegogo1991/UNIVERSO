@@ -255,8 +255,8 @@
     <button id="audio-close" aria-label="Cerrar reproductor">✕</button>
   </div>
   <select id="audio-track-select" aria-label="Seleccionar canción">
-    <option value="Assets/Musica/0_Binaural/BrainWaves.mp3">Ondas binaurales</option>
-    <option value="Assets/Musica/sesion 5/contando galaxias sesión 5.mpeg">Contando galaxias</option>
+    <option value="/Assets/Musica/0_Binaural/BrainWaves.mp3">Ondas binaurales</option>
+    <option value="/Assets/Musica/sesion 5/contando galaxias sesión 5.mpeg">Contando galaxias</option>
   </select>
   <div class="audio-controls">
     <button id="audio-play" type="button">▶ Play</button>
@@ -313,11 +313,7 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="main.js"></script>
+<script type="module" src="/main.js"></script>
 <script>
   const audioToggle = document.getElementById('audio-panel-toggle');
   const audioPanel = document.getElementById('audio-panel');
