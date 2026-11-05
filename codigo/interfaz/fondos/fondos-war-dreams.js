@@ -12,7 +12,7 @@
 
 export const FONDOS = {
   ninguno: 'Sin animación', estrellas: 'Estrellas titilantes', galaxia: 'Galaxia espiral',
-  hiperespacio: 'Salto al hiperespacio', hexagonos: 'Panal de hexágonos', codigo: 'Código hacker',
+  hiperespacio: 'Salto al hiperespacio', hexagonos: 'Panal de hexágonos', codigo: 'Lluvia de código',
   simbolos: 'Lluvia de símbolos', lluvia: 'Lluvia de luz', red: 'Constelación interactiva',
   esfera: 'Esfera orbital', ondas: 'Ondas de partículas', orbital: 'Nebulosa orbital',
 }

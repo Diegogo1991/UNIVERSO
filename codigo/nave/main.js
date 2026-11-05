@@ -13,15 +13,11 @@ import { btnE } from '../interfaz/elementos.js';
 import { actualizarMira } from './mira/funciones.js';
 import { actualizarEscaleraCabeceo } from './mira/escalera-cabeceo.js';
 import { inicializarControlesNave } from './controles-nave/funciones.js';
-import { inicializarInicioPerfil } from '../inicio_perfil/funciones.js';
 import { crearContenido } from '../contenido/objetos.js';
 import { cargarMundoLocal } from '../contenido/almacenamiento.js';
 import mundoBase from '../contenido/mundo-inicial.json';
 
 initLights(scene); inicializarControlesNave();
-inicializarInicioPerfil();
-// El inicio cubre el universo; la nave no responde hasta que PLAY lo libere.
-setEntradaSuspendida(true, 'inicio');
 let publicado = mundoBase;
 try { publicado = cargarMundoLocal('publicado', mundoBase); }
 catch (error) { mostrarMensajeTemporal('No se pudo abrir la versión local: ' + error.message, 7000); }

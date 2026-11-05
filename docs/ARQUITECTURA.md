@@ -2,7 +2,9 @@
 
 ## Capas
 
-- `codigo/nave/main.js`: arranque, loop 3D, interacciones y transiciones.
+- `codigo/arranque.js`: entrada de la página; inicia el inicio tipo perfil y expone
+  `cargarJuego()`, que importa el universo 3D bajo demanda (aún sin conectar a PLAY).
+- `codigo/nave/main.js`: loop 3D, interacciones y transiciones del juego.
 - `codigo/nave/simulacion.js`: estado y simulación de vuelo sin DOM ni escena.
 - `codigo/nave/nave.js`: entrada local, modelo y adaptación del estado a Three.js.
 - `codigo/nave/camara.js`: seguimiento y órbita, independientes de la simulación.

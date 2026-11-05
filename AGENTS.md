@@ -33,6 +33,8 @@ navegador proporcional al área modificada.
 
 - `index.html`: única entrada HTML y contrato de nodos DOM para todos los módulos
   de interfaz. Si se cambia un `id`, hay que actualizar su módulo `elementos.js`.
+- `codigo/arranque.js`: entrada de la página. Solo inicia `codigo/inicio_perfil/`;
+  el universo 3D se importa bajo demanda con `cargarJuego()` (aún desconectado de PLAY).
 - `codigo/nave/main.js`: composición de sistemas, interacción entre universos y
   loop principal. Debe seguir siendo un orquestador, no un contenedor de toda la
   lógica.
