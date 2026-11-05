@@ -95,7 +95,7 @@ button.inicio-hex:focus-visible, .inicio-esquina:focus-visible { outline: none; 
 button.inicio-hex:focus-visible .inicio-brillo, .inicio-esquina:focus-visible .inicio-brillo { opacity: 1; filter: blur(2px); }
 
 /* Perfil: el encuadre de la foto se ajusta con estas dos variables. */
-.inicio-hex-perfil { --foto-centro: 50% 45%; --foto-zoom: 1; }
+.inicio-hex-perfil { --foto-centro: 50% 25%; --foto-zoom: 1; }
 #inicio-perfil-foto {
   width: 100%; height: 100%; object-fit: cover; object-position: var(--foto-centro);
   transform: scale(var(--foto-zoom)); transform-origin: var(--foto-centro);
@@ -107,6 +107,50 @@ button.inicio-hex:focus-visible .inicio-brillo, .inicio-esquina:focus-visible .i
   letter-spacing: 0.32em; padding-left: 0.32em; /* compensa el espaciado final */
   color: var(--naranja-claro);
   text-shadow: 0 0 10px rgba(255, 122, 26, 0.8), 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+/* Energía recorriendo el nombre: cada letra repite el mismo pulso desfasado
+   --paso segundos respecto a la anterior. Con un paso = 5 % del ciclo, cuando
+   una letra está en su pico (10 %) la anterior y la siguiente están a medias
+   (15 % y 5 %): siempre se ven tres letras encendidas, la central más. */
+.inicio-nombre span {
+  --paso: 0.12s;
+  animation: inicio-energia calc(var(--paso) * 20) linear infinite;
+  animation-delay: calc(var(--i) * var(--paso));
+}
+@keyframes inicio-energia {
+  0%, 20%, 100% {
+    color: var(--naranja-claro);
+    text-shadow: 0 0 10px rgba(255, 122, 26, 0.8), 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  5%, 15% {
+    color: #ffd9b0;
+    text-shadow: 0 0 8px rgba(255, 170, 80, 0.95), 0 0 16px rgba(255, 122, 26, 0.8), 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  10% {
+    color: #ffffff;
+    text-shadow: 0 0 6px #fff3e6, 0 0 14px rgba(255, 180, 90, 1), 0 0 26px rgba(255, 122, 26, 1), 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Aviso "coming soon": cuadro de vidrio centrado que entra y sale suave. */
+#inicio-aviso {
+  position: absolute; z-index: 4; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(0.92);
+  padding: 16px 26px; border-radius: 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif; font-weight: 700;
+  font-size: 15px; letter-spacing: 0.32em; padding-left: calc(26px + 0.32em);
+  white-space: nowrap; color: #fff3e6;
+  text-shadow: 0 0 10px rgba(255, 122, 26, 0.9);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 45%, rgba(255, 122, 26, 0.12));
+  -webkit-backdrop-filter: blur(4px) saturate(1.3) brightness(0.9);
+  backdrop-filter: blur(4px) saturate(1.3) brightness(0.9);
+  box-shadow: 0 0 16px rgba(255, 122, 26, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+}
+#inicio-aviso.visible {
+  opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s;
 }
 
 /* Íconos: todos con relleno negro y trazo naranja. */
@@ -155,6 +199,39 @@ button.inicio-hex:focus-visible .inicio-brillo, .inicio-esquina:focus-visible .i
   right: calc(env(safe-area-inset-right, 0px) + var(--margen));
   transform-origin: top right;
 }
+.inicio-esquina-abajo-izquierda, .inicio-esquina-abajo-derecha {
+  top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + var(--margen));
+}
+.inicio-esquina-abajo-izquierda {
+  --forma: polygon(0 0, 0 100%, 100% 100%);
+  --anillo: polygon(evenodd, 0 0, 0 100%, 100% 100%, 0 0, 7% 16.9%, 83.1% 93%, 7% 93%, 7% 16.9%);
+  --filo: polygon(evenodd, 0 0, 0 100%, 100% 100%, 0 0, 3% 7.2%, 92.8% 97%, 3% 97%, 3% 7.2%);
+  left: calc(env(safe-area-inset-left, 0px) + var(--margen));
+  transform-origin: bottom left;
+}
+.inicio-esquina-abajo-derecha {
+  --forma: polygon(100% 0, 100% 100%, 0 100%);
+  --anillo: polygon(evenodd, 100% 0, 100% 100%, 0 100%, 100% 0, 93% 16.9%, 16.9% 93%, 93% 93%, 93% 16.9%);
+  --filo: polygon(evenodd, 100% 0, 100% 100%, 0 100%, 100% 0, 97% 7.2%, 7.2% 97%, 97% 97%, 97% 7.2%);
+  right: calc(env(safe-area-inset-right, 0px) + var(--margen));
+  transform-origin: bottom right;
+}
+.inicio-esquina.inicio-esquina-abajo-izquierda svg, .inicio-esquina.inicio-esquina-abajo-derecha svg { top: auto; bottom: 15%; }
+.inicio-esquina.inicio-esquina-abajo-izquierda svg { left: 15%; }
+.inicio-esquina.inicio-esquina-abajo-derecha svg { right: 15%; }
+.inicio-esquina[hidden] { display: none; }
+
+/* Reproducir/pausar: se muestra la acción disponible. */
+
+/* Sonido: con el video silenciado, el resplandor parpadea para invitar a tocarlo. */
+#inicio-sonido[aria-pressed="true"] .inicio-sonido-apagado,
+#inicio-sonido[aria-pressed="false"] .inicio-sonido-encendido { display: none; }
+#inicio-sonido[aria-pressed="false"] .inicio-brillo { animation: inicio-llamar-atencion 1.3s ease-in-out infinite; }
+@keyframes inicio-llamar-atencion {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
 .inicio-esquina .inicio-vidrio { display: block; }
 .inicio-esquina svg { position: absolute; top: 15%; width: 30%; height: 30%; stroke-width: 1.9; }
 .inicio-esquina-izquierda svg { left: 15%; }
@@ -220,4 +297,38 @@ button.inicio-hex:focus-visible .inicio-brillo, .inicio-esquina:focus-visible .i
 
 @media (prefers-reduced-motion: reduce) {
   .inicio-hex, .inicio-esquina { transition: none; }
+  #inicio-sonido[aria-pressed="false"] .inicio-brillo { animation-duration: 3s; }
+  .inicio-nombre span { animation: none; }
+  #inicio-aviso, #inicio-aviso.visible { transition: none; }
+}
+
+/* ── CARGA DEL INICIO ──
+   Negro con constelaciones (montadas desde funciones.js) y un hexágono cuyo
+   borde naranja recorre el contorno. pathLength="100" en el SVG permite medir
+   el trazo en porcentaje del perímetro. */
+#inicio-carga {
+  position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh;
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+  transition: opacity 0.6s ease; /* debe coincidir con SALIDA_CARGA_MS */
+}
+#inicio-carga.saliendo { opacity: 0; pointer-events: none; }
+#inicio-carga[hidden] { display: none; }
+.inicio-carga-hex {
+  position: relative; z-index: 1;
+  width: clamp(70px, 18vmin, 130px); overflow: visible;
+  filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.8));
+}
+.inicio-carga-hex path { stroke-linejoin: round; }
+.inicio-carga-base { fill: rgba(255, 122, 26, 0.04); stroke: rgba(255, 122, 26, 0.18); stroke-width: 2.5; }
+.inicio-carga-trazo {
+  fill: none; stroke: #ff7a1a; stroke-width: 3.5; stroke-linecap: round;
+  stroke-dasharray: 24 76;
+  animation: inicio-recorrido 1.6s linear infinite;
+}
+@keyframes inicio-recorrido { to { stroke-dashoffset: -100; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .inicio-carga-trazo { animation-duration: 4s; }
 }

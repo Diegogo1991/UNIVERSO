@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Universo DG — Un espacio para tus ideas</title>
+<link rel="icon" type="image/png" sizes="48x48" href="/iconos/logo-48.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/iconos/logo-512.png">
+<link rel="apple-touch-icon" href="/iconos/logo-180.png">
 <link rel="stylesheet" href="/codigo/interfaz-carga/estilos.css">
 <link rel="stylesheet" href="/codigo/interfaz/estilos.css">
 <link rel="stylesheet" href="/codigo/nave/mira/estilos.css">
@@ -32,6 +35,24 @@
       <div id="inicio-fondo-opciones"></div>
     </fieldset>
   </div>
+
+  <button id="inicio-sonido" class="inicio-esquina inicio-esquina-abajo-derecha" type="button" aria-label="Sonido ambiente" aria-pressed="false">
+    <span class="inicio-brillo"><span></span></span>
+    <span class="inicio-vidrio"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3.5 9.5h3.8L12 5.5v13l-4.7-4H3.5z"/>
+      <path class="inicio-sonido-apagado" d="M16 9.5l5 5M21 9.5l-5 5"/>
+      <path class="inicio-sonido-encendido" fill="none" d="M15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.6 7.6 0 0 1 0 10.8"/>
+    </svg></span>
+  </button>
+  <button id="inicio-espiral" class="inicio-esquina inicio-esquina-abajo-izquierda" type="button" aria-label="Espiral">
+    <span class="inicio-brillo"><span></span></span>
+    <span class="inicio-vidrio"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" d="M11.25 12.75a1.5 1.5 0 0 1 1.5 1.5 3 3 0 0 1-3 3 4.5 4.5 0 0 1-4.5-4.5 6 6 0 0 1 6-6 7.5 7.5 0 0 1 7.5 7.5"/>
+    </svg></span>
+  </button>
+
+  <!-- Aviso para los botones que aún no tienen función -->
+  <div id="inicio-aviso" role="status" aria-live="polite"></div>
 
   <div class="inicio-mitad" id="inicio-mitad-perfil">
     <div class="inicio-panal">
@@ -79,6 +100,14 @@
     </div>
   </div>
 </section>
+
+<!-- Carga del inicio: cubre la página hasta que la foto y el video estén listos -->
+<div id="inicio-carga" role="status" aria-label="Cargando">
+  <svg class="inicio-carga-hex" viewBox="-4 -4 108 123.47" aria-hidden="true">
+    <path class="inicio-carga-base" pathLength="100" d="M50 0 L100 28.87 L100 86.6 L50 115.47 L0 86.6 L0 28.87 Z"/>
+    <path class="inicio-carga-trazo" pathLength="100" d="M50 0 L100 28.87 L100 86.6 L50 115.47 L0 86.6 L0 28.87 Z"/>
+  </svg>
+</div>
 
 <div id="loading">
   <div id="loading-name">DIEGO GIRALDO</div>

@@ -1,6 +1,7 @@
 import { montarFondo, FONDOS } from '../interfaz/fondos/fondos-war-dreams.js';
+import { crearAudioAmbiente } from './audio-ambiente.js';
 import { inicioPerfil, capaFondo, videoFondo, mitadPerfil, mitadBotones, panalPerfil, hexPerfil,
-  nombrePerfil, botonPlay, botonesSatelite, botonAjustes, panelAjustes, opcionesFondo } from './elementos.js';
+  nombrePerfil, fotoPerfil, cargaInicio, botonPlay, botonesSatelite, botonAjustes, botonEspiral, botonMenu, aviso, botonSonido, panelAjustes, opcionesFondo } from './elementos.js';
 
 // ─── PARÁMETROS DE DISEÑO ────────────────────────────────────────────────────
 const AREA_PERFIL = 0.19;            // fracción del área de su mitad
@@ -16,10 +17,17 @@ const PROPORCION_SATELITE_MAX = 0.62;
 // (ángulos de pantalla: y crece hacia abajo).
 const ANGULOS_SATELITES = [-120, -60, 0, 60, 120, 180];
 
+const TEXTO_PROXIMAMENTE = 'COMING SOON';
+const DURACION_AVISO_MS = 4000;
+const AUDIO_AMBIENTE = '/inicio_perfil/olas-de-mar-reverberacion.m4a';
 const FONDO_VIDEO = 'video';
 const OPCIONES_FONDO = { [FONDO_VIDEO]: 'Video: Playa Diego', ...FONDOS };
 const CLAVE_FONDO = 'inicio-perfil-fondo-seleccion';
 const ESTILO_FONDO = { color: '#ff7a1a', colorFondo: '#070402', colorPuntos: '#3d1f0a', opacidad: 0.6 };
+const ESTILO_CARGA = { tipo: 'red', color: '#ff7a1a', colorFondo: '#000000', cuadricula: false, opacidad: 0.75, densidad: 0.5 };
+// Si la red es muy lenta, el inicio se muestra igual pasado este tiempo.
+const ESPERA_MAXIMA_MS = 15000;
+const SALIDA_CARGA_MS = 600;   // igual a la transición de #inicio-carga en estilos.css
 
 const SQRT3 = Math.sqrt(3);
 const SEN60 = SQRT3 / 2;
@@ -97,6 +105,70 @@ function inicializarFondo() {
     aplicar(target.value);
     try { localStorage.setItem(CLAVE_FONDO, target.value); } catch { /* sin almacenamiento: solo dura la sesión */ }
   });
+  return inicial;
+}
+
+function esperar(elemento, listo, eventos) {
+  return new Promise(resolver => {
+    if (listo()) { resolver(); return; }
+    eventos.forEach(evento => elemento.addEventListener(evento, resolver, { once: true }));
+  });
+}
+
+// Un recurso que falla también libera la carga: mejor un hueco que una espera eterna.
+function mostrarCuandoCargue(conVideo) {
+  const fondoCarga = montarFondo(cargaInicio, ESTILO_CARGA);
+  const recursos = [esperar(fotoPerfil, () => fotoPerfil.complete, ['load', 'error'])];
+  if (conVideo) recursos.push(esperar(videoFondo, () => videoFondo.readyState >= 4, ['canplaythrough', 'error']));
+  const limite = new Promise(resolver => setTimeout(resolver, ESPERA_MAXIMA_MS));
+  Promise.race([Promise.all(recursos), limite]).then(() => {
+    cargaInicio.classList.add('saliendo');
+    setTimeout(() => { cargaInicio.hidden = true; fondoCarga.destruir(); }, SALIDA_CARGA_MS);
+  });
+}
+
+// El video siempre va en silencio; el sonido es un audio ambiente aparte que
+// solo puede empezar con un toque del usuario.
+function inicializarSonido() {
+  const ambiente = crearAudioAmbiente(AUDIO_AMBIENTE);
+  let activo = false;
+  const reflejar = () => botonSonido.setAttribute('aria-pressed', String(activo));
+  botonSonido.addEventListener('click', () => {
+    activo = !activo;
+    reflejar();
+    if (!activo) { ambiente.desactivar(); return; }
+    ambiente.activar().catch(error => {
+      console.error('No se pudo reproducir el audio ambiente:', error);
+      activo = false; reflejar();
+    });
+  });
+  reflejar();
+}
+
+// Botones sin función todavía: muestran un aviso que se oculta solo.
+function inicializarProximamente() {
+  let temporizador = 0;
+  const mostrar = () => {
+    aviso.textContent = TEXTO_PROXIMAMENTE;
+    aviso.classList.add('visible');
+    clearTimeout(temporizador);
+    temporizador = setTimeout(() => aviso.classList.remove('visible'), DURACION_AVISO_MS);
+  };
+  [botonMenu, botonPlay, ...botonesSatelite, botonEspiral].forEach(boton => boton.addEventListener('click', mostrar));
+}
+
+// Cada letra es un span con su índice; la animación CSS (inicio-energia) se
+// desfasa por letra para que el brillo avance de izquierda a derecha.
+function prepararEnergiaNombre() {
+  const texto = nombrePerfil.textContent;
+  nombrePerfil.setAttribute('aria-label', texto);
+  nombrePerfil.replaceChildren(...[...texto].map((letra, i) => {
+    const span = document.createElement('span');
+    span.textContent = letra;
+    span.style.setProperty('--i', i);
+    span.setAttribute('aria-hidden', 'true');
+    return span;
+  }));
 }
 
 function abrirAjustes(abrir) {
@@ -114,7 +186,11 @@ export function inicializarInicioPerfil() {
   observador.observe(mitadPerfil);
   observador.observe(mitadBotones);
 
-  inicializarFondo();
+  inicializarSonido();
+  inicializarProximamente();
+  prepararEnergiaNombre();
+  const fondoInicial = inicializarFondo();
+  mostrarCuandoCargue(fondoInicial === FONDO_VIDEO);
 
   botonAjustes.addEventListener('click', () => abrirAjustes(panelAjustes.hidden));
   inicioPerfil.addEventListener('pointerdown', e => {
