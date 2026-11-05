@@ -1,0 +1,43 @@
+[hidden] { display: none !important; }
+body { touch-action: auto; }
+#barra-mundo { position: fixed; top: 20px; right: 22px; z-index: 15; display: flex; gap: 10px; align-items: center; color: #9ac0ce; font-size: 10px; letter-spacing: 1px; }
+#barra-mundo button, #editor button, .editor-importar { border: 1px solid #36525e; background: #142936; color: #e3f3f8; border-radius: 7px; padding: 9px 12px; cursor: pointer; font: inherit; }
+#barra-mundo button:hover, #editor button:hover { background: #244857; }
+#aviso-global { position: fixed; top: 78px; left: 50%; transform: translateX(-50%); z-index: 110; padding: 12px 18px; border-radius: 8px; background: #122c3deb; color: #e2f5ff; max-width: 90vw; font-size: 12px; pointer-events: none; }
+#aviso-global:empty, #contenido-pista:empty { display: none; }
+#contenido-pista { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); z-index: 8; padding: 10px 16px; border: 1px solid #477384; background: #081620df; color: #c9f3ff; border-radius: 6px; font-size: 12px; text-align: center; pointer-events: none; }
+#editor { position: fixed; top: 12px; right: 12px; bottom: 12px; width: 360px; z-index: 40; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 20px; background: #081722f5; border: 1px solid #2d4856; border-radius: 14px; color: #d5e8ed; box-shadow: 0 12px 60px #0008; font: 12px/1.5 'Segoe UI', sans-serif; }
+#editor header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+#editor h1 { font-size: 24px; font-weight: 500; margin-top: 3px; }
+#editor small { font-size: 9px; letter-spacing: 1.8px; color: #7ddbd0; }
+.editor-nota { color: #9bb0bb; font-size: 11px; margin: 8px 0 14px; }
+#editor label { display: flex; flex-direction: column; gap: 5px; margin: 10px 0; min-width: 0; }
+#editor input:not([type=color]), #editor select, #editor textarea { width: 100%; background: #101f2b; color: #edf6fa; border: 1px solid #344954; border-radius: 5px; padding: 8px; font: inherit; touch-action: auto; }
+#editor select option { padding: 5px; }
+#editor input[type=color] { width: 100%; height: 33px; background: #101f2b; border: 0; }
+#editor input:focus, #editor select:focus, #editor textarea:focus { outline: 1px solid #79d8ff; }
+.editor-fila { display: flex; gap: 8px; align-items: end; }
+.editor-fila > * { flex: 1; }
+.editor-fila > button { margin-bottom: 10px; }
+#editor fieldset { border: 0; border-top: 1px solid #30434e; padding-top: 8px; }
+#editor legend { color: #89dcd4; padding-right: 8px; }
+#editor fieldset:disabled { opacity: 0.4; }
+#editor .editor-primario { background: #9be1d6; color: #0a292b; border-color: #9be1d6; }
+.editor-acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
+#editor .editor-importar { margin: 0; text-align: center; justify-content: center; }
+.editor-importar input { display: none; }
+#editor-estado { margin-top: 12px; color: #a7dfd6; }
+#editor button:disabled { opacity: 0.4; cursor: default; }
+.transformacion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+#editor .transformacion label { margin: 3px 0 8px; color: #95acb8; }
+body.editando #hud, body.editando #mira,body.editando #contenido-pista, body.editando #joystick-wrap, body.editando #btn-e, body.editando #touch-hint, body.editando #btn-config-controles, body.editando #barra-mundo, body.editando #audio-panel-toggle { display: none; }
+#detalle-objeto { margin: auto; width: min(720px, 92vw); max-height: 88vh; overflow: auto; background: #0b1b29; border: 1px solid #467282; border-radius: 14px; color: #dcedf5; padding: 28px; font: 15px/1.7 'Segoe UI', sans-serif; touch-action: pan-y; }
+#detalle-objeto::backdrop { background: #000b; }
+#detalle-cerrar { float: right; background: transparent; color: #bdeafa; border: 0; padding: 4px 10px; cursor: pointer; }
+#detalle-imagen { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; margin: 16px auto; }
+#detalle-texto { white-space: pre-wrap; }
+#hud { max-width: 440px; }
+#btn-config-controles { top: 166px; }
+canvas { touch-action: none; }
+@media (max-width: 900px) { #barra-mundo { top: 12px; right: 12px; } #barra-mundo > span { display: none; } #touch-hint { top: 60px; } #editor { width: 330px; max-width: 92vw; } }
+@media (max-width: 600px) { #btn-config-controles { top: 12px; left: 12px; } #editor { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-width: none; max-height: 52vh; padding: 14px; } #barra-mundo { font-size: 10px; } #contenido-pista { bottom: 110px; width: 75%; } #mira { gap: 50px; } }

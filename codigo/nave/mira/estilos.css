@@ -1,0 +1,49 @@
+/* ── MIRA (HUD tipo caza: crosshair central + escalas de ENERGÍA / VELOCIDAD) ──
+   --mira-color y --mira-escala son custom properties que configurarMira() (en
+   funciones.js) cambia en vivo desde el panel de controles-nave. Se definen en
+   :root (no en #mira) porque la escalera de cabeceo es un elemento HERMANO de
+   #mira, no descendiente — así ambos las heredan y se actualizan juntos. */
+:root {
+  --mira-color: rgba(120, 200, 255, 0.85);
+  --mira-escala: 1;
+}
+
+#mira {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(var(--mira-escala));
+  transform-origin: center;
+  display: flex; align-items: center; gap: 80px; /* espacio de sobra para la escalera de cabeceo en el medio */
+  pointer-events: none; z-index: 6; /* por encima del HUD (5), debajo del joystick (10) */
+  color: var(--mira-color);
+  font-size: 10px; letter-spacing: 2px;
+}
+
+/* Marcador central: cruz simple, como el punto de mira de un caza */
+#mira-centro {
+  width: 22px; height: 22px; position: relative; flex-shrink: 0;
+}
+#mira-centro::before, #mira-centro::after {
+  content: ''; position: absolute; background: var(--mira-color);
+}
+#mira-centro::before { top: 50%; left: 0; width: 100%; height: 2px; transform: translateY(-50%); }
+#mira-centro::after  { left: 50%; top: 0; height: 100%; width: 2px; transform: translateX(-50%); }
+
+/* Escalas laterales (ENERGÍA a la izquierda, VELOCIDAD a la derecha) */
+.mira-escala {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  width: 34px;
+}
+.mira-escala-label { font-weight: bold; opacity: 0.85; text-align: center; }
+.mira-escala-track {
+  width: 6px; height: 90px; border-radius: 3px;
+  background: rgba(120, 200, 255, 0.12);
+  border: 1px solid var(--mira-color);
+  overflow: hidden;
+  display: flex; align-items: flex-end; /* la barra crece desde abajo */
+}
+.mira-escala-fill {
+  width: 100%; height: 0%;
+  background: var(--mira-color);
+  transition: height 0.15s ease-out;
+}
+.mira-escala-valor { font-weight: bold; }

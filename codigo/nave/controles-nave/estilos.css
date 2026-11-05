@@ -1,0 +1,125 @@
+/* ── PALETA NARANJA (misma familia que el CV overlay: rgba(255,140,0,*) y
+   derivados), variando tono/opacidad entre elementos para dar jerarquía visual. ── */
+
+/* ── BOTÓN FLOTANTE (⚙ + 🎮) ──
+   Fuera de #hud a propósito: #hud se oculta con display:none bajo 600px, y este
+   botón debe seguir siendo alcanzable en mobile. En desktop queda justo debajo
+   del bloque de instrucciones del HUD; en mobile se reubica arriba a la izquierda
+   (icono compacto, ya que el texto del HUD está oculto ahí de todas formas). */
+#btn-config-controles {
+  position: fixed; top: 200px; left: 20px;
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(40, 20, 0, 0.55); border: 1px solid rgba(255, 140, 0, 0.35);
+  color: rgba(255, 170, 80, 0.85);
+  font-size: 14px; padding: 6px 10px; border-radius: 10px;
+  cursor: pointer; z-index: 25; pointer-events: auto;
+  transition: background 0.2s, border-color 0.2s;
+}
+#btn-config-controles:hover {
+  background: rgba(60, 30, 0, 0.7); border-color: rgba(255, 160, 0, 0.6);
+}
+@media (max-width: 600px) {
+  #btn-config-controles { top: 20px; left: 20px; padding: 8px; font-size: 16px; }
+}
+
+/* ── OVERLAY DEL PANEL (mismo patrón que #cv-overlay) ── */
+#panel-controles {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(10, 5, 0, 0.9); z-index: 40; /* por encima del CV overlay (20) */
+}
+#panel-controles.active { display: flex; }
+
+#panel-controles-card {
+  background: linear-gradient(145deg, rgba(20, 10, 0, 0.98), rgba(30, 15, 0, 0.98));
+  border: 1px solid rgba(255, 140, 0, 0.35); border-radius: 18px;
+  padding: 32px 36px; width: 92%; max-width: 620px; max-height: 88vh; overflow-y: auto;
+  color: #ffeedd; position: relative;
+  box-shadow: 0 0 70px rgba(255, 140, 0, 0.18);
+}
+#panel-controles-cerrar {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255, 140, 0, 0.1); border: 1px solid rgba(255, 140, 0, 0.3);
+  color: rgba(255, 140, 0, 0.75); width: 28px; height: 28px; border-radius: 50%;
+  cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+#panel-controles-cerrar:hover { background: rgba(255, 100, 0, 0.25); color: #ffaa00; }
+
+.panel-controles-titulo {
+  font-size: 11px; letter-spacing: 3px; color: rgba(255, 180, 100, 0.6);
+  text-transform: uppercase; margin-bottom: 20px;
+}
+
+/* ── PESTAÑAS: rectángulo con 3 pestañas, responsive (se apilan en pantallas chicas) ── */
+.panel-controles-tabs {
+  display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.tab-controles {
+  flex: 1; min-width: 110px;
+  background: rgba(255, 140, 0, 0.08); border: 1px solid rgba(255, 140, 0, 0.25);
+  color: rgba(255, 200, 150, 0.7); border-radius: 10px 10px 0 0;
+  padding: 10px 8px; font-size: 10px; letter-spacing: 1px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.tab-controles small { opacity: 0.7; font-size: 9px; }
+.tab-controles:hover { background: rgba(255, 140, 0, 0.16); }
+.tab-controles.active {
+  background: rgba(255, 140, 0, 0.28); border-color: rgba(255, 160, 0, 0.6);
+  color: #ffcc99; font-weight: bold;
+}
+/* Pestaña "Avanzado" bloqueada en mobile: se ve atenuada pero sigue clickeable
+   para mostrar el aviso "Solo para PC" */
+.tab-controles.bloqueada { opacity: 0.45; }
+.tab-controles.bloqueada::after { content: ' 🔒'; }
+
+.panel-controles-contenido {
+  background: rgba(255, 140, 0, 0.05); border: 1px solid rgba(255, 140, 0, 0.15);
+  border-radius: 0 10px 10px 10px; padding: 20px; margin-bottom: 24px;
+}
+.tab-contenido-desc {
+  font-size: 12px; line-height: 1.6; color: rgba(255, 220, 190, 0.85); margin-bottom: 16px;
+}
+/* El mensaje de bloqueo mobile y el resto del contenido de la pestaña son
+   mutuamente excluyentes: bloqueada, solo se ve el aviso "Solo para PC". */
+.tab-contenido-bloqueo { display: none; font-size: 13px; color: rgba(255, 160, 100, 0.9); text-align: center; padding: 20px 0; }
+.tab-contenido.bloqueado-mobile > *:not(.tab-contenido-bloqueo) { display: none; }
+.tab-contenido.bloqueado-mobile .tab-contenido-bloqueo { display: block; }
+
+/* ── REASIGNACIÓN DE TECLAS (modo Avanzado: acelerar / frenar) ──
+   Mismo espíritu que una fila "Acción — [TECLA]" de un menú de controles. */
+.rebind-grupo {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px; font-size: 11px; color: rgba(255, 200, 150, 0.8);
+}
+.rebind-tecla {
+  min-width: 64px; padding: 6px 12px; border-radius: 8px;
+  background: rgba(255, 140, 0, 0.12); border: 1px solid rgba(255, 140, 0, 0.4);
+  color: #ffcc99; font-family: inherit; font-size: 11px; font-weight: bold;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
+}
+.rebind-tecla:hover { background: rgba(255, 140, 0, 0.24); border-color: rgba(255, 160, 0, 0.7); }
+
+/* ── SLIDERS DE SENSIBILIDAD (y controles de la mira, misma apariencia) ── */
+.slider-grupo {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px; font-size: 11px; color: rgba(255, 200, 150, 0.8);
+}
+.slider-grupo:last-child { margin-bottom: 0; }
+.slider-grupo input[type="range"] {
+  flex: 1; max-width: 180px; accent-color: rgba(255, 140, 0, 0.85);
+}
+.slider-grupo input[type="color"] {
+  width: 40px; height: 24px; border: 1px solid rgba(255, 140, 0, 0.4);
+  border-radius: 6px; background: transparent; cursor: pointer;
+}
+
+/* ── CONFIGURACIÓN DE LA MIRA (sección aparte, siempre visible sin importar la pestaña) ── */
+.panel-controles-mira-config {
+  background: rgba(255, 140, 0, 0.05); border: 1px solid rgba(255, 140, 0, 0.15);
+  border-radius: 10px; padding: 16px 20px;
+}
+.panel-controles-seccion-titulo {
+  font-size: 9px; letter-spacing: 3px; color: rgba(255, 180, 100, 0.5);
+  text-transform: uppercase; margin-bottom: 12px;
+}

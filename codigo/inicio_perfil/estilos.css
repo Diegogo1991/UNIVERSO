@@ -1,0 +1,223 @@
+/* ── INICIO TIPO PERFIL ──────────────────────────────────────────────────────
+   Dos mitades: perfil y panal de botones. Vertical = arriba/abajo; horizontal =
+   izquierda/derecha. funciones.js calcula por área el lado de cada hexágono
+   (--s) y la posición de los satélites (--x, --y). */
+#inicio-perfil {
+  --naranja: #ff7a1a;
+  --naranja-claro: #ffb15c;
+  --negro: #070402;
+  /* 100dvh = alto visible real: descuenta las barras del navegador móvil. */
+  position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh;
+  z-index: 200;
+  display: flex; flex-direction: column;
+  background: var(--negro); color: var(--naranja);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+#inicio-perfil[hidden] { display: none; }
+
+@media (orientation: landscape) {
+  #inicio-perfil { flex-direction: row; }
+}
+
+/* ── FONDO ── el video (horizontal) se recorta centrado en pantallas verticales. */
+#inicio-fondo, #inicio-video { position: absolute; inset: 0; width: 100%; height: 100%; }
+#inicio-video { object-fit: cover; object-position: center; filter: brightness(0.72) saturate(1.1); }
+#inicio-video[hidden] { display: none; }
+
+.inicio-mitad {
+  position: relative; z-index: 1;
+  flex: 1 1 0; min-width: 0; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+/* Punto de anclaje: los hexágonos se centran sobre él. */
+.inicio-panal { --s: 0px; position: relative; width: 0; height: 0; }
+
+/* ── CRISTAL ──
+   Cada forma define tres polígonos: --forma (silueta), --anillo (banda del
+   contorno que se desenfoca como resplandor) y --filo (reflejo fino del canto).
+   Los anillos usan evenodd: contorno exterior + interior = solo la banda.
+   .inicio-brillo es hermano del cristal, no ancestro: un filter en un ancestro
+   aislaría el backdrop-filter. El blur va en el contenedor sin recorte. */
+.inicio-brillo, .inicio-brillo > span, .inicio-vidrio { position: absolute; inset: 0; }
+.inicio-brillo {
+  filter: blur(var(--brillo, 5px)); opacity: 0.7;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.inicio-brillo > span { background: var(--naranja); clip-path: var(--anillo); }
+.inicio-vidrio {
+  clip-path: var(--forma);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.07));
+  /* Sin desenfoque: el fondo se ve nítido, solo un poco más luminoso. */
+  -webkit-backdrop-filter: brightness(1.12) saturate(1.15);
+  backdrop-filter: brightness(1.12) saturate(1.15);
+  pointer-events: auto;
+  transition: background 0.2s ease;
+}
+.inicio-vidrio::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  clip-path: var(--filo);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.6), rgba(255, 210, 170, 0.15) 40%, rgba(255, 255, 255, 0.04) 60%, rgba(255, 220, 180, 0.4));
+}
+
+/* ── HEXÁGONO (punta arriba) ── */
+.inicio-hex {
+  --forma: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  --anillo: polygon(evenodd, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%, 50% 0,
+    50% 5%, 5% 27.5%, 5% 72.5%, 50% 95%, 95% 72.5%, 95% 27.5%, 50% 5%);
+  --filo: polygon(evenodd, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%, 50% 0,
+    50% 1.5%, 1.5% 25.75%, 1.5% 74.25%, 50% 98.5%, 98.5% 74.25%, 98.5% 25.75%, 50% 1.5%);
+  --brillo: max(3px, calc(var(--s) * 0.06));
+  --x: 0px; --y: 0px; --escala: 1;
+  position: absolute; left: var(--x); top: var(--y);
+  width: calc(var(--s) * 1.7320508); height: calc(var(--s) * 2);
+  transform: translate(-50%, -50%) scale(var(--escala));
+  transition: transform 0.18s ease;
+  padding: 0; border: 0; background: none; color: inherit; font: inherit;
+  pointer-events: none; /* solo la silueta hexagonal (.inicio-vidrio) recibe el puntero */
+}
+
+button.inicio-hex, .inicio-esquina { cursor: pointer; }
+button.inicio-hex:hover, .inicio-esquina:hover { --escala: 1.06; }
+button.inicio-hex:hover .inicio-brillo, .inicio-esquina:hover .inicio-brillo,
+.inicio-esquina[aria-expanded="true"] .inicio-brillo { opacity: 0.9; }
+button.inicio-hex:hover .inicio-vidrio, .inicio-esquina:hover .inicio-vidrio {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.22), rgba(255, 150, 60, 0.06) 45%, rgba(255, 122, 26, 0.12));
+}
+button.inicio-hex:active, .inicio-esquina:active { --escala: 0.96; }
+button.inicio-hex:focus-visible, .inicio-esquina:focus-visible { outline: none; }
+button.inicio-hex:focus-visible .inicio-brillo, .inicio-esquina:focus-visible .inicio-brillo { opacity: 1; filter: blur(2px); }
+
+/* Perfil: el encuadre de la foto se ajusta con estas dos variables. */
+.inicio-hex-perfil { --foto-centro: 50% 45%; --foto-zoom: 1; }
+#inicio-perfil-foto {
+  width: 100%; height: 100%; object-fit: cover; object-position: var(--foto-centro);
+  transform: scale(var(--foto-zoom)); transform-origin: var(--foto-centro);
+}
+.inicio-nombre {
+  position: absolute; left: 0; top: var(--nombre-y, 0px); transform: translateX(-50%);
+  margin: 0; white-space: nowrap;
+  font-size: clamp(13px, calc(var(--s) * 0.13), 22px); font-weight: 700;
+  letter-spacing: 0.32em; padding-left: 0.32em; /* compensa el espaciado final */
+  color: var(--naranja-claro);
+  text-shadow: 0 0 10px rgba(255, 122, 26, 0.8), 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Íconos: todos con relleno negro y trazo naranja. */
+.inicio-icono, .inicio-esquina svg {
+  fill: rgba(8, 4, 2, 0.82); stroke: var(--naranja);
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(255, 122, 26, 0.75));
+  overflow: visible;
+}
+.inicio-icono { width: calc(var(--s) * 0.62); height: auto; stroke-width: 1.5; }
+
+/* PLAY */
+.inicio-play-icono { width: calc(var(--s) * 0.42); margin-left: calc(var(--s) * 0.05); }
+.inicio-play-texto {
+  margin-top: calc(var(--s) * 0.06);
+  font-size: calc(var(--s) * 0.24); font-weight: 800; letter-spacing: 0.2em;
+  padding-left: 0.2em; /* compensa el letter-spacing para que quede centrado */
+  color: var(--naranja-claro);
+  text-shadow: 0 0 8px rgba(255, 122, 26, 0.9);
+}
+
+/* ── ESQUINAS: triángulos rectángulos que siguen la esquina de la pantalla ── */
+.inicio-esquina {
+  --tam: 78px; --margen: 10px; --escala: 1;
+  --brillo: 6px;
+  position: absolute; z-index: 3;
+  top: calc(env(safe-area-inset-top, 0px) + var(--margen));
+  width: var(--tam); height: var(--tam);
+  padding: 0; border: 0; background: none; color: var(--naranja);
+  transform: scale(var(--escala)); transition: transform 0.18s ease;
+  pointer-events: none;
+}
+/* Puntas rectas. Bandas interiores a grosor constante: la hipotenusa se
+   desplaza d·(1+√2) sobre los catetos. */
+.inicio-esquina-izquierda {
+  --forma: polygon(0 0, 100% 0, 0 100%);
+  --anillo: polygon(evenodd, 0 0, 100% 0, 0 100%, 0 0, 7% 7%, 7% 83.1%, 83.1% 7%, 7% 7%);
+  --filo: polygon(evenodd, 0 0, 100% 0, 0 100%, 0 0, 3% 3%, 3% 92.8%, 92.8% 3%, 3% 3%);
+  left: calc(env(safe-area-inset-left, 0px) + var(--margen));
+  transform-origin: top left;
+}
+.inicio-esquina-derecha {
+  --forma: polygon(0 0, 100% 0, 100% 100%);
+  --anillo: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 0, 16.9% 7%, 93% 83.1%, 93% 7%, 16.9% 7%);
+  --filo: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 0, 7.2% 3%, 97% 92.8%, 97% 3%, 7.2% 3%);
+  right: calc(env(safe-area-inset-right, 0px) + var(--margen));
+  transform-origin: top right;
+}
+.inicio-esquina .inicio-vidrio { display: block; }
+.inicio-esquina svg { position: absolute; top: 15%; width: 30%; height: 30%; stroke-width: 1.9; }
+.inicio-esquina-izquierda svg { left: 15%; }
+.inicio-esquina-derecha svg { right: 15%; }
+
+#inicio-panel-ajustes {
+  position: absolute; z-index: 3;
+  top: calc(env(safe-area-inset-top, 0px) + 96px);
+  right: calc(env(safe-area-inset-right, 0px) + 10px);
+  width: min(270px, calc(100vw - 20px));
+  /* Nunca más alto que lo visible: si no cabe, la lista se desplaza dentro. */
+  max-height: calc(100% - env(safe-area-inset-top, 0px) - 106px);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 8px; border-radius: 14px;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03) 45%, rgba(255, 122, 26, 0.08));
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) brightness(0.85);
+  backdrop-filter: blur(16px) saturate(1.4) brightness(0.85);
+  box-shadow: 0 0 14px rgba(255, 122, 26, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  scrollbar-width: thin; scrollbar-color: rgba(255, 122, 26, 0.6) transparent;
+}
+#inicio-panel-ajustes[hidden] { display: none; }
+
+/* Misma tipografía que el nombre del perfil. */
+#inicio-fondos {
+  margin: 0; padding: 0; border: 0; min-width: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif; font-weight: 700; text-transform: uppercase;
+}
+#inicio-fondos legend {
+  padding: 0 10px 8px; font-size: 11px; letter-spacing: 0.32em; color: var(--naranja);
+}
+#inicio-fondo-opciones { display: flex; flex-direction: column; gap: 2px; }
+.inicio-fondo-opcion {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 12px; letter-spacing: 0.14em; color: rgba(255, 210, 170, 0.82);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+/* El radio queda accesible (teclado y lector) pero invisible. */
+.inicio-fondo-opcion input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.inicio-fondo-opcion::before {
+  content: ''; flex: none; width: 9px; height: 10px;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: rgba(255, 210, 170, 0.25);
+  transition: background 0.15s ease;
+}
+.inicio-fondo-opcion:hover { background: rgba(255, 255, 255, 0.08); color: var(--naranja-claro); }
+.inicio-fondo-opcion:has(input:checked) {
+  background: linear-gradient(90deg, rgba(255, 122, 26, 0.28), rgba(255, 122, 26, 0.04));
+  color: #fff3e6; text-shadow: 0 0 8px rgba(255, 122, 26, 0.9);
+}
+.inicio-fondo-opcion:has(input:checked)::before { background: var(--naranja); }
+.inicio-fondo-opcion:has(input:focus-visible) { outline: 2px solid var(--naranja); outline-offset: -2px; }
+
+@media (max-width: 600px) {
+  .inicio-esquina { --tam: 66px; --margen: 8px; }
+  #inicio-panel-ajustes {
+    top: calc(env(safe-area-inset-top, 0px) + 82px);
+    max-height: calc(100% - env(safe-area-inset-top, 0px) - 92px);
+  }
+  .inicio-mitad { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inicio-hex, .inicio-esquina { transition: none; }
+}

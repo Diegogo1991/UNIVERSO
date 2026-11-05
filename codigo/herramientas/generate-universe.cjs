@@ -1,6 +1,6 @@
 /**
  * Script Node.js para generar la estructura del universo como JSON
- * Ejecutar: node generate-universe.js
+ * Ejecutar: node codigo/herramientas/generate-universe.js
  */
 
 const fs = require('fs');
@@ -53,15 +53,16 @@ function getFileType(ext) {
   return 'file';
 }
 
-const assetsPath = path.join(__dirname, 'Assets');
+const projectRoot = path.join(__dirname, '..', '..');
+const assetsPath = path.join(projectRoot, 'recursos-estaticos');
 
 if (!fs.existsSync(assetsPath)) {
-  console.error('❌ No se encontró la carpeta Assets');
+  console.error('❌ No se encontró la carpeta recursos-estaticos');
   process.exit(1);
 }
 
 const universe = scanDirectory(assetsPath);
-const output = path.join(__dirname, 'universe-data.json');
+const output = path.join(projectRoot, 'universe-data.json');
 
 fs.writeFileSync(output, JSON.stringify(universe, null, 2));
 console.log('✅ Universo generado:', output);

@@ -3,212 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Diego Giraldo — Portafolio 3D</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; }
-  canvas { display: block; }
-
-  /* ── HUD ── */
-  #hud {
-    position: fixed; top: 20px; left: 20px;
-    color: rgba(120,200,255,0.7); font-size: 11px;
-    line-height: 2; letter-spacing: 1px;
-    pointer-events: none; z-index: 5;
-  }
-  #hud .label { color: rgba(120,200,255,0.35); }
-  #hud .title { font-size: 13px; font-weight: bold; color: rgba(140,210,255,0.9); letter-spacing: 3px; margin-bottom: 8px; }
-  @media (max-width: 600px) { #hud { display: none; } }
-
-  /* ── PLANET HINT ── */
-  #planet-hint {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    color: rgba(100,200,255,0.6); font-size: 10px; letter-spacing: 3px;
-    pointer-events: none; z-index: 5; opacity: 0; transition: opacity 0.5s;
-    animation: blink 2s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
-
-  /* ── INTERACT PROMPT ── */
-  #interact-prompt {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    opacity: 0; transition: opacity 0.4s; pointer-events: none; z-index: 5; text-align: center;
-  }
-  #interact-box {
-    background: rgba(4,8,28,0.88); border: 1px solid rgba(80,160,255,0.3);
-    border-radius: 12px; padding: 14px 28px;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-  }
-  .interact-label { color: rgba(140,210,255,0.9); font-size: 12px; letter-spacing: 3px; }
-  .interact-key   { color: rgba(100,180,255,0.5); font-size: 10px; letter-spacing: 2px; }
-
-  /* ── SPEED BAR ── */
-  #speed-bar {
-    position: fixed; bottom: 24px; right: 24px;
-    display: flex; flex-direction: column; align-items: flex-end;
-    gap: 4px; pointer-events: none; z-index: 5;
-  }
-  #speed-label { color: rgba(100,200,255,0.35); font-size: 9px; letter-spacing: 2px; }
-  #speed-track { width: 80px; height: 3px; background: rgba(100,200,255,0.1); border-radius: 2px; overflow: hidden; }
-  #speed-fill  { height: 100%; width: 0%; background: rgba(100,200,255,0.7); transition: width 0.1s; border-radius: 2px; }
-
-  /* ── JOYSTICK ── */
-  #joystick-wrap {
-    position: fixed; bottom: 36px; left: 36px;
-    z-index: 10; display: none;
-  }
-  @media (max-width: 900px) { #joystick-wrap { display: block; } }
-
-  #joystick {
-    width: 110px; height: 110px; border-radius: 50%;
-    background: rgba(10,20,60,0.55);
-    border: 1px solid rgba(80,160,255,0.25);
-    position: relative; touch-action: none;
-  }
-  #joystick-knob {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: rgba(60,130,255,0.35);
-    border: 1px solid rgba(100,180,255,0.5);
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    transition: transform 0.05s;
-    pointer-events: none;
-  }
-  #joystick-label {
-    text-align: center; margin-top: 6px;
-    color: rgba(100,180,255,0.3); font-size: 9px; letter-spacing: 2px;
-  }
-
-  /* ── BOTÓN E MÓVIL ── */
-  #btn-e {
-    position: fixed; bottom: 36px; right: 36px;
-    width: 64px; height: 64px; border-radius: 50%;
-    background: rgba(10,20,60,0.6); border: 1px solid rgba(80,160,255,0.3);
-    color: rgba(100,200,255,0.8); font-size: 11px; letter-spacing: 1px;
-    display: none; align-items: center; justify-content: center;
-    flex-direction: column; gap: 2px; z-index: 10;
-    touch-action: none; cursor: pointer;
-  }
-  #btn-e span { font-size: 9px; color: rgba(100,180,255,0.4); letter-spacing: 1px; }
-  @media (max-width: 900px) { #btn-e { display: flex; } }
-
-  /* ── MOUSE DRAG CURSOR ── */
-  canvas { cursor: grab; }
-  canvas:active { cursor: grabbing; }
-
-  /* ── CV OVERLAY ── */
-  #cv-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    display: none; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.95); z-index: 20;
-  }
-  #cv-overlay.active { display: flex; }
-  #cv-card {
-    background: linear-gradient(145deg, rgba(10,10,10,0.98), rgba(20,20,20,0.98));
-    border: 1px solid rgba(255,140,0,0.3); border-radius: 20px;
-    padding: 44px 52px; max-width: 560px; width: 92%; color: #ffeedd;
-    position: relative; animation: floatCard 4s ease-in-out infinite;
-    box-shadow: 0 0 80px rgba(255,140,0,0.2);
-    max-height: 90vh; overflow-y: auto;
-  }
-  @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  .cv-corner { position: absolute; width: 18px; height: 18px; border-color: rgba(255,140,0,0.5); border-style: solid; }
-  .cv-corner.tl { top: 14px; left: 14px; border-width: 1px 0 0 1px; }
-  .cv-corner.tr { top: 14px; right: 14px; border-width: 1px 1px 0 0; }
-  .cv-corner.bl { bottom: 14px; left: 14px; border-width: 0 0 1px 1px; }
-  .cv-corner.br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
-  #close-btn {
-    position: absolute; top: 18px; right: 18px;
-    background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3);
-    color: rgba(255,140,0,0.7); width: 30px; height: 30px;
-    border-radius: 50%; cursor: pointer; font-size: 14px;
-    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-  }
-  #close-btn:hover { background: rgba(255,100,0,0.2); color: #ffaa00; }
-  .cv-name { font-size: 24px; font-weight: 700; letter-spacing: 3px; color: #ffaa00; margin-bottom: 6px; }
-  .cv-subtitle {
-    font-size: 10px; letter-spacing: 3px; color: rgba(255,180,100,0.7);
-    text-transform: uppercase; margin-bottom: 28px;
-    padding-bottom: 20px; border-bottom: 1px solid rgba(255,140,0,0.2); line-height: 1.8;
-  }
-  .cv-section { margin-bottom: 22px; }
-  .cv-section-title { font-size: 9px; letter-spacing: 4px; color: rgba(255,180,100,0.5); text-transform: uppercase; margin-bottom: 10px; }
-  .skill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-  .skill-tag {
-    background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3);
-    border-radius: 20px; padding: 5px 14px; font-size: 11px; color: rgba(255,200,150,0.9);
-    transition: all 0.2s;
-  }
-  .skill-tag:hover {
-    background: rgba(255,140,0,0.2); border-color: rgba(255,160,0,0.5); color: #ffeedd;
-  }
-  .cv-role { display: flex; align-items: center; gap: 10px; font-size: 12px; color: rgba(255,200,150,0.8); margin-bottom: 8px; }
-  .cv-role::before { content: '▹'; color: rgba(255,140,0,0.6); font-size: 10px; }
-
-  /* ── LOADING ── */
-  #loading {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #00000f; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; z-index: 100; transition: opacity 0.8s;
-  }
-  #loading.hidden { opacity: 0; pointer-events: none; }
-  #loading-name { color: rgba(120,200,255,0.9); font-size: 18px; letter-spacing: 6px; margin-bottom: 32px; }
-  #loading-bar-wrap { width: 200px; height: 2px; background: rgba(100,180,255,0.1); border-radius: 2px; overflow: hidden; }
-  #loading-bar { height: 100%; width: 0%; background: rgba(100,200,255,0.8); transition: width 0.3s; border-radius: 2px; }
-  #loading-text { margin-top: 16px; color: rgba(100,180,255,0.35); font-size: 10px; letter-spacing: 3px; }
-
-  /* ── TOUCH HINT ── */
-  #touch-hint {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    color: rgba(100,180,255,0.5); font-size: 10px; letter-spacing: 2px;
-    pointer-events: none; z-index: 5; display: none; text-align: center; line-height: 1.8;
-  }
-  @media (max-width: 900px) { #touch-hint { display: block; } }
-
-  /* ── AUDIO PLAYER FLOTANTE ── */
-  #audio-panel-toggle {
-    position: fixed; bottom: 24px; right: 24px;
-    width: 52px; height: 52px; border-radius: 50%;
-    background: rgba(10,20,60,0.8); border: 1px solid rgba(80,160,255,0.3);
-    color: rgba(180,240,255,0.95); font-size: 20px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; z-index: 30;
-  }
-  #audio-panel {
-    position: fixed; bottom: 88px; right: 24px;
-    width: 260px; background: rgba(4,8,28,0.95);
-    border: 1px solid rgba(80,160,255,0.4); border-radius: 14px;
-    padding: 12px; color: #d8eeff; z-index: 30;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    transform: translateY(12px); opacity: 0; pointer-events: none;
-    transition: transform 0.25s ease, opacity 0.25s ease;
-  }
-  #audio-panel.open {
-    transform: translateY(0); opacity: 1; pointer-events: auto;
-  }
-  #audio-panel .audio-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px; font-size: 12px; letter-spacing: 1px;
-  }
-  #audio-panel .audio-header button {
-    border: 0; background: rgba(255,255,255,0.08);
-    color: #fff; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-  }
-  #audio-panel select {
-    width: 100%; margin-bottom: 8px; border-radius: 10px;
-    border: 1px solid rgba(160,220,255,0.3); background: rgba(8,16,36,0.9);
-    color: #d8eeff; padding: 6px;
-  }
-  #audio-panel .audio-controls { display: flex; gap: 6px; margin-bottom: 6px; }
-  #audio-panel .audio-controls button {
-    flex: 1; height: 30px; border-radius: 8px;
-    border: 1px solid rgba(80,160,255,0.3); background: rgba(15,30,66,0.95);
-    color: #d8eeff; cursor: pointer;
-  }
-  #audio-status { font-size: 11px; color: rgba(180,220,255,0.8); }
-</style>
+<title>Universo DG — Un espacio para tus ideas</title>
+<link rel="stylesheet" href="/codigo/interfaz-carga/estilos.css">
+<link rel="stylesheet" href="/codigo/interfaz/estilos.css">
+<link rel="stylesheet" href="/codigo/nave/mira/estilos.css">
+<link rel="stylesheet" href="/codigo/nave/controles-nave/estilos.css">
+<link rel="stylesheet" href="/codigo/editor/estilos.css">
+<link rel="stylesheet" href="/codigo/inicio_perfil/estilos.css">
 </head>
 <body>
+
+<!-- Inicio tipo perfil (linktr.ee): cubre el universo 3D hasta que se pulse PLAY -->
+<section id="inicio-perfil" aria-label="Inicio">
+  <div id="inicio-fondo" aria-hidden="true"></div>
+  <video id="inicio-video" src="/inicio_perfil/playa-diego.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+
+  <button id="inicio-menu" class="inicio-esquina inicio-esquina-izquierda" type="button" aria-label="Menú">
+    <span class="inicio-brillo"><span></span></span>
+    <span class="inicio-vidrio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+  </button>
+  <button id="inicio-ajustes" class="inicio-esquina inicio-esquina-derecha" type="button" aria-label="Ajustes" aria-expanded="false" aria-controls="inicio-panel-ajustes">
+    <span class="inicio-brillo"><span></span></span>
+    <span class="inicio-vidrio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+  </button>
+  <div id="inicio-panel-ajustes" hidden>
+    <fieldset id="inicio-fondos">
+      <legend>Fondo</legend>
+      <div id="inicio-fondo-opciones"></div>
+    </fieldset>
+  </div>
+
+  <div class="inicio-mitad" id="inicio-mitad-perfil">
+    <div class="inicio-panal">
+      <div class="inicio-hex inicio-hex-perfil">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><img id="inicio-perfil-foto" src="/inicio_perfil/foto-perfil.jpg" alt="Foto de perfil de Diego Giraldo"></span>
+      </div>
+      <h1 class="inicio-nombre">DIEGO GIRALDO</h1>
+    </div>
+  </div>
+
+  <div class="inicio-mitad" id="inicio-mitad-botones">
+    <div class="inicio-panal">
+      <button id="inicio-play" class="inicio-hex inicio-hex-play" type="button" aria-label="Play">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio">
+          <svg class="inicio-icono inicio-play-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+          <span class="inicio-play-texto">PLAY</span>
+        </span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Rayo">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2.5 4.5 13.5h6.5l-1 8 9-11h-6.5z"/></svg></span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Billete">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="1.5"/><circle cx="12" cy="12" r="2.8"/><path d="M6 10v4M18 10v4"/></svg></span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Fuego">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.8 5.6 4.8 10.6a4.8 4.8 0 0 1-9.6 0c0-2.4 1.2-4 2.4-5.2.2 1.7 1 2.8 2.2 3.3C11.4 9 11 6 12 2.5z"/><path d="M12 21.5a2.2 2.2 0 0 1-2.2-2.2c0-1.4 1.2-2.2 2.2-3.6 1 1.4 2.2 2.2 2.2 3.6a2.2 2.2 0 0 1-2.2 2.2z"/></svg></span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Cerebro">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3 3 0 0 0-5.8-1A3.2 3.2 0 0 0 3.6 8.6a3.4 3.4 0 0 0 .6 5.8A3.4 3.4 0 0 0 8.4 19.5 3 3 0 0 0 12 20.5z"/><path d="M12 5a3 3 0 0 1 5.8-1 3.2 3.2 0 0 1 2.6 4.6 3.4 3.4 0 0 1-.6 5.8 3.4 3.4 0 0 1-4.2 5.1A3 3 0 0 1 12 20.5z"/><path d="M8.5 9.5c1 0 1.8.7 1.8 1.7M15.5 9.5c-1 0-1.8.7-1.8 1.7M7.5 14.5c1.2.2 2 .9 2.3 2M16.5 14.5c-1.2.2-2 .9-2.3 2"/></svg></span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Cámara">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.8-2.5h5.4L16.5 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+      </button>
+      <button class="inicio-hex inicio-hex-satelite" type="button" aria-label="Computador">
+        <span class="inicio-brillo"><span></span></span>
+        <span class="inicio-vidrio"><svg class="inicio-icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="5" width="15" height="10.5" rx="1.2"/><path d="M2.5 19h19l-1.5-3.5H4z"/></svg></span>
+      </button>
+    </div>
+  </div>
+</section>
 
 <div id="loading">
   <div id="loading-name">DIEGO GIRALDO</div>
@@ -219,14 +89,45 @@
 <!-- HUD desktop -->
 <div id="hud">
   <div class="title">// NAVE DG-01</div>
-  <span class="label">W / ↑</span> — impulso<br>
-  <span class="label">S / ↓</span> — freno<br>
-  <span class="label">A D / ← →</span> — rotar<br>
-  <span class="label">Q / E</span> — alabeo<br>
-  <span class="label">DRAG</span> — girar cámara<br>
-  <span class="label">CLICK PLANETA</span> — CV<br>
-  <span class="label">CONSOLA</span> — setPlanetPulseIntensity(2.5)
+  <span id="vuelo-modo">EXPLORACIÓN</span><br>
+  <span id="vuelo-ayuda">W impulso · S/Espacio freno · A/D girar · Q/Z subir/bajar</span><br>
+  <span class="label">ARRASTRAR / RUEDA</span> — cámara / distancia<br>
+  <span class="label">E / CLIC</span> — interactuar · <span class="label">R</span> — volver
 </div>
+
+<div id="barra-mundo"><span id="nombre-universo">UNIVERSO INICIAL</span><button id="abrir-editor" hidden>Taller local</button><button id="volver-inicio">Volver al inicio</button></div>
+<div id="aviso-global" role="status" aria-live="polite"></div>
+<div id="contenido-pista" aria-live="polite"></div>
+<aside id="editor" aria-label="Taller de universos" hidden>
+  <header><div><small>UNIVERSO DG / CREADOR LOCAL</small><h1>Taller de ideas</h1></div><button id="cerrar-editor" aria-label="Cerrar taller">✕</button></header>
+  <p class="editor-nota">Compón tu mundo. Los borradores y la publicación se guardan solo en este navegador.</p>
+  <label>Universo de trabajo<select id="editor-universo"><option value="universo-inicial">Universo inicial</option><option value="universo-rosado">Universo rosado</option></select></label>
+  <div class="editor-fila"><label>Nuevo elemento<select id="editor-tipo"><option value="plano">Dibujo / imagen</option><option value="modelo">Modelo GLB</option><option value="galaxia">Galaxia</option><option value="espiral">Espiral</option><option value="portal">Portal</option></select></label><button id="editor-agregar">Añadir</button></div>
+  <label>Objetos de este universo<select id="editor-lista" size="3" aria-label="Objetos de este universo"></select></label>
+  <div class="editor-fila"><button id="editor-enfocar">Enfocar</button><button id="editor-duplicar">Duplicar</button><button id="editor-eliminar">Eliminar</button></div>
+  <form id="editor-propiedades">
+    <fieldset id="editor-campos" disabled>
+      <legend>Objeto seleccionado</legend>
+      <label>Nombre<input id="objeto-nombre" maxlength="80" required></label>
+      <div class="editor-fila"><label>Color<input id="objeto-color" type="color" value="#79d8ff"></label><label>Herramienta<select id="editor-herramienta"><option value="translate">Mover</option><option value="rotate">Rotar</option><option value="scale">Escalar</option></select></label></div>
+      <p class="editor-nota">Arrastra los ejes en la escena o introduce valores. Rotación en grados.</p>
+      <div id="editor-transformaciones"></div>
+      <label>Recurso local<input id="objeto-recurso" placeholder="/dibujos/mi-dibujo.png"></label>
+      <label id="imagen-importar-label">Importar imagen (máx. 650 KB)<input id="objeto-imagen" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      <label>Al interactuar<select id="objeto-accion"><option value="ninguna">Solo contemplar</option><option value="informacion">Mostrar información / ampliar imagen</option><option value="portal">Viajar a otro universo</option></select></label>
+      <label>Texto<textarea id="objeto-texto" rows="3" maxlength="2000"></textarea></label>
+      <label>Destino del portal<select id="objeto-destino"><option value="universo-inicial">Universo inicial</option><option value="universo-rosado">Universo rosado</option></select></label>
+      <button type="submit" class="editor-primario">Aplicar al objeto</button>
+    </fieldset>
+  </form>
+  <div class="editor-acciones"><button id="editor-guardar">Guardar borrador</button><button id="editor-publicar" class="editor-primario">Publicar localmente</button><button id="editor-exportar">Exportar JSON</button><label class="editor-importar">Importar JSON<input id="editor-importar" type="file" accept="application/json,.json"></label><button id="editor-deshacer">Deshacer último cambio</button></div>
+  <p id="editor-estado" role="status" aria-live="polite">Listo para crear.</p>
+  <p class="editor-nota">Arrastra el fondo para orbitar; rueda para acercarte. Cerrar vuelve a la versión publicada. Guarda o exporta para conservar el borrador.</p>
+</aside>
+<dialog id="detalle-objeto"><button id="detalle-cerrar" aria-label="Cerrar objeto">✕</button><h2 id="detalle-titulo"></h2><img id="detalle-imagen" alt="" hidden><p id="detalle-texto"></p></dialog>
+
+<!-- Botón de configuración de controles (fuera de #hud para seguir alcanzable en móvil) -->
+<button id="btn-config-controles" aria-label="Configuración de controles">⚙🎮</button>
 
 <!-- Touch hint móvil -->
 <div id="touch-hint">
@@ -255,9 +156,7 @@
     <button id="audio-close" aria-label="Cerrar reproductor">✕</button>
   </div>
   <select id="audio-track-select" aria-label="Seleccionar canción">
-    <option value="/Assets/Musica/0_Binaural/BrainWaves.mp3">Ondas binaurales</option>
-    <option value="/Assets/Musica/sesion 5/contando galaxias sesión 5.mpeg">Contando galaxias</option>
-  </select>
+    <option value="/musica-global/0_Binaural/BrainWaves.mp3">Ondas binaurales</option>  </select>
   <div class="audio-controls">
     <button id="audio-play" type="button">▶ Play</button>
     <button id="audio-pause" type="button">⏸ Pause</button>
@@ -276,8 +175,94 @@
 </div>
 
 <!-- Botón E móvil -->
-<div id="btn-e">
+<button id="btn-e" type="button">
   E<span>INTERACTUAR</span>
+</button>
+
+<!-- Mira (HUD tipo caza): crosshair central + escalas de ENERGÍA (izq) y VELOCIDAD (der) -->
+<div id="mira" aria-hidden="true">
+  <div class="mira-escala mira-escala-izquierda">
+    <div class="mira-escala-label">ENERGÍA</div>
+    <div class="mira-escala-track"><div id="mira-energia-fill" class="mira-escala-fill"></div></div>
+    <div id="mira-energia-valor" class="mira-escala-valor">100</div>
+  </div>
+
+  <div id="mira-centro"></div>
+
+  <div class="mira-escala mira-escala-derecha">
+    <div class="mira-escala-label">VELOCIDAD</div>
+    <div class="mira-escala-track"><div id="mira-velocidad-fill" class="mira-escala-fill"></div></div>
+    <div id="mira-velocidad-valor" class="mira-escala-valor">0</div>
+  </div>
+</div>
+
+<!-- Panel de configuración de controles -->
+<div id="panel-controles" aria-hidden="true">
+  <div id="panel-controles-card">
+    <button id="panel-controles-cerrar" aria-label="Cerrar configuración">✕</button>
+    <div class="panel-controles-titulo">// CONFIGURACIÓN DE CONTROLES</div>
+
+    <div class="panel-controles-tabs">
+      <button class="tab-controles active" data-modo="estandar">ESTÁNDAR</button>
+      <button class="tab-controles" data-modo="medio">MEDIO<br><small>(ARCADE)</small></button>
+      <button class="tab-controles" data-modo="avanzado">AVANZADO<br><small>(AS DE COMBATE)</small></button>
+    </div>
+
+    <div class="panel-controles-contenido">
+      <div class="tab-contenido" data-modo="estandar">
+        <p class="tab-contenido-desc">Exploración: W acelera, S o Espacio frena, A/D gira y Q/Z sube o baja el morro. Shift activa el turbo. Arrastra para mirar; usa la rueda para acercar la cámara. En móvil: joystick para avanzar/girar, arrastre derecho para mirar.</p>
+        <div class="slider-grupo">
+          <label for="slider-sens-rotacion">Sensibilidad de rotación</label>
+          <input type="range" id="slider-sens-rotacion" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+        <div class="slider-grupo">
+          <label for="slider-sens-camara">Sensibilidad de cámara</label>
+          <input type="range" id="slider-sens-camara" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+        <div class="slider-grupo">
+          <label for="slider-sens-joystick">Sensibilidad de joystick</label>
+          <input type="range" id="slider-sens-joystick" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+      </div>
+
+      <div class="tab-contenido" data-modo="medio" hidden>
+        <p class="tab-contenido-desc">La nave apunta hacia donde mirás: en PC, movés el mouse (W/S siguen acelerando y frenando); en celular, el joystick gira y empuja, y arrastrás la cámara para subir o bajar.</p>
+        <div class="slider-grupo">
+          <label for="slider-sens-direccion-medio">Sensibilidad de dirección</label>
+          <input type="range" id="slider-sens-direccion-medio" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+      </div>
+
+      <div class="tab-contenido" data-modo="avanzado" hidden>
+        <p class="tab-contenido-desc">W/S inclina el morro, A/D gira, Q/Z alabea. Shift acelera y Ctrl frena (reasignables); Espacio también frena. E queda reservado para interactuar.</p>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Acelerar</span>
+          <button class="rebind-tecla" id="rebind-acelerar" type="button">SHIFT</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Frenar</span>
+          <button class="rebind-tecla" id="rebind-frenar" type="button">CTRL</button>
+        </div>
+        <div class="slider-grupo">
+          <label for="slider-sens-inclinacion-avanzado">Sensibilidad de inclinación</label>
+          <input type="range" id="slider-sens-inclinacion-avanzado" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+        <p class="tab-contenido-bloqueo">🔒 Solo para PC</p>
+      </div>
+    </div>
+
+    <div class="panel-controles-mira-config">
+      <div class="panel-controles-seccion-titulo">// MIRA</div>
+      <div class="slider-grupo">
+        <label for="mira-color-input">Color</label>
+        <input type="color" id="mira-color-input" value="#78c8ff">
+      </div>
+      <div class="slider-grupo">
+        <label for="mira-tamano-input">Tamaño</label>
+        <input type="range" id="mira-tamano-input" min="0.6" max="1.6" step="0.05" value="1">
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- CV OVERLAY -->
@@ -313,116 +298,6 @@
   </div>
 </div>
 
-<script type="module" src="/main.js"></script>
-<script>
-  const audioToggle = document.getElementById('audio-panel-toggle');
-  const audioPanel = document.getElementById('audio-panel');
-  const audioClose  = document.getElementById('audio-close');
-  const trackSelect = document.getElementById('audio-track-select');
-  const audioEl     = document.getElementById('bg-audio');
-  const playBtn     = document.getElementById('audio-play');
-  const pauseBtn    = document.getElementById('audio-pause');
-  const stopBtn     = document.getElementById('audio-stop');
-  const statusLbl   = document.getElementById('audio-status');
-
-  function updateStatus(text) {
-    statusLbl.textContent = 'Estado: ' + text;
-  }
-
-  function setTrack(src) {
-    if (!src) return;
-    const wasPlaying = !audioEl.paused && !audioEl.ended;
-    audioEl.src = src;
-    audioEl.load();
-    if (wasPlaying) audioEl.play().catch(() => {});
-  }
-
-  audioToggle.addEventListener('click', () => {
-    const isOpen = audioPanel.classList.toggle('open');
-    audioPanel.setAttribute('aria-hidden', !isOpen);
-  });
-
-  audioClose.addEventListener('click', () => {
-    audioPanel.classList.remove('open');
-    audioPanel.setAttribute('aria-hidden', 'true');
-  });
-
-  trackSelect.addEventListener('change', (e) => {
-    setTrack(e.target.value);
-    updateStatus('cargando ' + e.target.selectedOptions[0].text);
-    audioEl.play().then(() => updateStatus('reproduciendo ' + e.target.selectedOptions[0].text))
-    .catch(() => updateStatus('Play bloqueado, haz click manualmente'));
-  });
-
-  playBtn.addEventListener('click', () => {
-    if (!audioEl.src) setTrack(trackSelect.value);
-    audioEl.play().then(() => updateStatus('reproduciendo ' + trackSelect.selectedOptions[0].text))
-      .catch(() => updateStatus('No se puede reproducir (permiso navegador).'));
-  });
-
-  pauseBtn.addEventListener('click', () => {
-    audioEl.pause();
-    updateStatus('pausado');
-  });
-
-  stopBtn.addEventListener('click', () => {
-    audioEl.pause();
-    audioEl.currentTime = 0;
-    updateStatus('detenido');
-  });
-
-  audioEl.addEventListener('ended', () => updateStatus('detenido'));
-  audioEl.addEventListener('play', () => updateStatus('reproduciendo'));
-  audioEl.addEventListener('pause', () => updateStatus('pausado'));
-
-  // ── CONTINUOUS CURVE FLOATING MOVEMENT ──
-  let floatTime = 0;
-  let floatVelX = (Math.random() - 0.5) * 2;
-  let floatVelY = (Math.random() - 0.5) * 2;
-  let floatPosX = 0;
-  let floatPosY = 0;
-
-  const maxXLeft = 280;   // Distancia máxima hacia la izquierda
-  const maxXRight = 20;   // Distancia máxima hacia la derecha (limitada para no salir)
-  const maxYTop = 280;    // Distancia máxima hacia arriba
-  const minYBottom = -30; // Distancia mínima hacia abajo
-
-  function updateAudioFloatPosition() {
-    floatTime += 0.02; // Incremento de tiempo (controla velocidad general)
-
-    // Cambio suave de velocidad usando seno y coseno con múltiples frecuencias
-    floatVelX += (Math.sin(floatTime * 0.5) * 0.1 - floatVelX * 0.05);
-    floatVelY += (Math.cos(floatTime * 0.7) * 0.1 - floatVelY * 0.05);
-
-    // Limitar velocidades
-    floatVelX = Math.max(-0.8, Math.min(0.8, floatVelX));
-    floatVelY = Math.max(-0.8, Math.min(0.8, floatVelY));
-
-    // Actualizar posición
-    floatPosX += floatVelX;
-    floatPosY += floatVelY;
-
-    // Rebote suave en los límites (mantiene dentro del rango asimétrico)
-    if (floatPosX > maxXRight || floatPosX < -maxXLeft) {
-      floatVelX *= -0.8;
-      floatPosX = Math.max(-maxXLeft, Math.min(maxXRight, floatPosX));
-    }
-    if (floatPosY > minYBottom || floatPosY < -maxYTop) {
-      floatVelY *= -0.8;
-      floatPosY = Math.max(-maxYTop, Math.min(minYBottom, floatPosY));
-    }
-
-    // Aplicar transformación
-    audioToggle.style.transform = `translate(${floatPosX}px, ${floatPosY}px)`;
-  }
-
-  // Animar continuamente
-  function animateFloatLoop() {
-    updateAudioFloatPosition();
-    requestAnimationFrame(animateFloatLoop);
-  }
-  animateFloatLoop();
-
-</script>
+<script type="module" src="/codigo/nave/main.js"></script>
 </body>
 </html>

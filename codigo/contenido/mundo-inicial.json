@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "objetos": [
+    { "id": "idea-inicial", "tipo": "plano", "universo": "universo-inicial", "nombre": "Un espacio para tus ideas", "posicion": [-15, 5, -45], "rotacion": [0, 12, 0], "escala": [1, 1, 1], "color": "#79d8ff", "recurso": "", "accion": { "tipo": "informacion", "texto": "Aquí puedes colocar tus dibujos, modelos y experiencias. Abre el Taller local para crear tu primer objeto. Acércate y pulsa E, o selecciona los objetos con un clic.", "destino": "universo-rosado" } },
+    { "id": "portal-inicial", "tipo": "portal", "universo": "universo-inicial", "nombre": "Hacia el universo rosado", "posicion": [25, 4, -65], "rotacion": [0, 0, 0], "escala": [1, 1, 1], "color": "#cb91ff", "recurso": "", "accion": { "tipo": "portal", "texto": "Cruza hacia otra colección de ideas.", "destino": "universo-rosado" } },
+    { "id": "galaxia-rosada", "tipo": "galaxia", "universo": "universo-rosado", "nombre": "Una galaxia de ideas", "posicion": [90, 12, -125], "rotacion": [35, 0, 0], "escala": [1, 1, 1], "color": "#ef9dff", "recurso": "", "accion": { "tipo": "informacion", "texto": "Cada objeto puede tener su propia forma y su propia acción. Esta galaxia se genera a partir de partículas.", "destino": "universo-inicial" } }
+  ]
+}
