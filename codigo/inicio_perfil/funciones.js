@@ -193,6 +193,18 @@ export function inicializarInicioPerfil() {
   mostrarCuandoCargue(fondoInicial === FONDO_VIDEO);
 
   botonAjustes.addEventListener('click', () => abrirAjustes(panelAjustes.hidden));
+  // Con mouse o toque, elegir un fondo cierra el menú. Con teclado las flechas
+  // cambian de fondo sin cerrarlo (si no, no se podría recorrer la lista); Enter lo cierra.
+  let porTeclado = false;
+  opcionesFondo.addEventListener('pointerdown', () => { porTeclado = false; });
+  opcionesFondo.addEventListener('keydown', e => {
+    porTeclado = true;
+    if (e.key === 'Enter') { abrirAjustes(false); botonAjustes.focus(); }
+  });
+  // El clic en la etiqueta se reenvía al radio: se atiende solo ese para no cerrar dos veces.
+  opcionesFondo.addEventListener('click', e => {
+    if (!porTeclado && e.target.matches('input')) abrirAjustes(false);
+  });
   inicioPerfil.addEventListener('pointerdown', e => {
     if (!panelAjustes.hidden && !panelAjustes.contains(e.target) && !botonAjustes.contains(e.target)) abrirAjustes(false);
   });
