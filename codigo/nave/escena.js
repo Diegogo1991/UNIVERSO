@@ -36,4 +36,15 @@ envLight.position.set(0, 50, 0);
 scene.add(envLight);
 scene.environment = envTexture;
 
-export const clock = new THREE.Clock();
+// Reloj del juego: igual que THREE.Clock para quien lo lee, pero se puede
+// pausar sin que el tiempo salte al reanudar (las animaciones dependen de t).
+const relojReal = new THREE.Clock();
+let pausadoDesde = null, tiempoEnPausa = 0;
+export const clock = {
+  getElapsedTime: () => (pausadoDesde ?? relojReal.getElapsedTime()) - tiempoEnPausa
+};
+export function pausarReloj(pausar) {
+  const ahora = relojReal.getElapsedTime();
+  if (pausar && pausadoDesde === null) pausadoDesde = ahora;
+  else if (!pausar && pausadoDesde !== null) { tiempoEnPausa += ahora - pausadoDesde; pausadoDesde = null; }
+}

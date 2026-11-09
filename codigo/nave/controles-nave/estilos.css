@@ -123,3 +123,94 @@
   font-size: 9px; letter-spacing: 3px; color: rgba(255, 180, 100, 0.5);
   text-transform: uppercase; margin-bottom: 12px;
 }
+
+/* ── INTERRUPTORES DEL HUD (checkbox con apariencia de slider on/off) ──
+   La perilla es un radial-gradient del fondo (no un ::before) para que se vea
+   igual en todos los navegadores. */
+.interruptor-grupo {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px; font-size: 11px; color: rgba(255, 200, 150, 0.8);
+}
+.interruptor-grupo label { cursor: pointer; }
+.interruptor {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 42px; height: 22px; border-radius: 11px; cursor: pointer;
+  border: 1px solid rgba(255, 140, 0, 0.45);
+  background-color: rgba(255, 140, 0, 0.1);
+  background-image: radial-gradient(circle, rgba(255, 200, 150, 0.75) 0 7px, transparent 7.5px);
+  background-size: 20px 20px; background-repeat: no-repeat; background-position: 0 50%;
+  transition: background-position 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.interruptor:checked {
+  background-color: rgba(255, 140, 0, 0.7); border-color: rgba(255, 170, 60, 0.9);
+  background-image: radial-gradient(circle, #fff3e6 0 7px, transparent 7.5px);
+  background-position: 22px 50%;
+}
+.interruptor:focus-visible { outline: 2px solid #ffcc99; outline-offset: 2px; }
+
+.boton-personalizar-hud {
+  width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 10px;
+  background: rgba(255, 140, 0, 0.16); border: 1px solid rgba(255, 140, 0, 0.5);
+  color: #ffcc99; font-family: inherit; font-size: 11px; font-weight: bold;
+  letter-spacing: 2px; cursor: pointer; transition: all 0.2s;
+}
+.boton-personalizar-hud:hover { background: rgba(255, 140, 0, 0.3); border-color: rgba(255, 170, 60, 0.8); }
+
+/* ── PANTALLA "PERSONALIZAR HUD" ──
+   Transparente en el centro para ver el HUD y la nave en vivo; la tarjeta va
+   abajo. Cubre toda la pantalla para que no se interactúe con el juego. */
+#personalizar-hud {
+  position: fixed; inset: 0; z-index: 45;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 18px 16px calc(env(safe-area-inset-bottom, 0px) + 18px);
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(10, 5, 0, 0.55));
+}
+#personalizar-hud[hidden] { display: none; }
+.personalizar-hud-pausa {
+  padding: 6px 14px; border-radius: 8px;
+  background: rgba(40, 20, 0, 0.7); border: 1px solid rgba(255, 140, 0, 0.4);
+  color: #ffcc99; font-size: 11px; letter-spacing: 3px;
+}
+#personalizar-hud-card {
+  width: min(460px, 100%);
+  background: linear-gradient(145deg, rgba(20, 10, 0, 0.88), rgba(30, 15, 0, 0.88));
+  border: 1px solid rgba(255, 140, 0, 0.35); border-radius: 16px;
+  padding: 20px 24px; color: #ffeedd;
+  box-shadow: 0 0 40px rgba(255, 140, 0, 0.18);
+}
+#personalizar-hud-card .slider-grupo:last-of-type { margin-bottom: 12px; }
+.personalizar-hud-acciones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.personalizar-hud-listo { background: rgba(255, 140, 0, 0.35); }
+
+@media (max-width: 600px) {
+  #personalizar-hud-card { padding: 16px 18px; }
+  #personalizar-hud-card .slider-grupo { flex-wrap: wrap; }
+  #personalizar-hud-card .slider-grupo input[type="range"] { max-width: none; width: 100%; }
+}
+
+/* ── SOLO MÓVIL: secciones de controles táctiles (mismo breakpoint que ellos) ── */
+.solo-movil { display: none; }
+@media (max-width: 900px) { .solo-movil { display: block; } }
+.panel-controles-mira-config + .panel-controles-mira-config { margin-top: 16px; }
+.personalizar-hud-tactil { margin-top: 6px; padding-top: 10px; border-top: 1px solid rgba(255, 140, 0, 0.2); }
+
+/* Selector de esquema táctil: dos opciones tipo pestaña */
+.selector-esquema { display: flex; gap: 8px; flex-wrap: wrap; }
+.selector-esquema label { flex: 1; min-width: 130px; cursor: pointer; }
+.selector-esquema input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.selector-esquema span {
+  display: block; padding: 10px 8px; border-radius: 10px; text-align: center;
+  background: rgba(255, 140, 0, 0.08); border: 1px solid rgba(255, 140, 0, 0.25);
+  color: rgba(255, 200, 150, 0.75); font-size: 10px; letter-spacing: 1px; transition: all 0.2s;
+}
+.selector-esquema input:checked + span {
+  background: rgba(255, 140, 0, 0.28); border-color: rgba(255, 160, 0, 0.6); color: #ffcc99; font-weight: bold;
+}
+.selector-esquema input:focus-visible + span { outline: 2px solid #ffcc99; outline-offset: 2px; }
+
+.selector-panel {
+  max-width: 180px; padding: 5px 8px; border-radius: 8px;
+  background: rgba(30, 15, 0, 0.9); border: 1px solid rgba(255, 140, 0, 0.4);
+  color: #ffcc99; font-family: inherit; font-size: 11px;
+}
+.selector-panel:disabled { opacity: 0.45; }

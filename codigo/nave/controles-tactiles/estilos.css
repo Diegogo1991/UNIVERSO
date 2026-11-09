@@ -1,0 +1,106 @@
+/* ── CONTROLES TÁCTILES (≤900 px) ────────────────────────────────────────────
+   Cada .tactil-control se centra en (--x, --y) y se escala con --escala; los
+   valores por defecto están aquí y "Personalizar HUD" los sobrescribe inline. */
+#controles-tactiles, #btn-e { display: none; }
+@media (max-width: 900px) {
+  #controles-tactiles { display: block; }
+  #btn-e { display: flex; }
+}
+body:not(.controles-joysticks) [data-esquema="joysticks"],
+body:not(.controles-flechas) [data-esquema="flechas"] { display: none; }
+
+.tactil-control {
+  --escala: 1;
+  position: fixed; left: var(--x); top: var(--y); z-index: 10;
+  transform: translate(-50%, -50%) scale(var(--escala));
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+
+/* ── HEXÁGONO NARANJA ──
+   El elemento recortado es el borde naranja; ::before es el interior oscuro y
+   translúcido. Proporción de un hexágono de punta arriba: ancho = 0.866 × alto. */
+.tactil-hex {
+  --forma-hex: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  --borde-hex: 2px;
+  position: relative; isolation: isolate;
+  aspect-ratio: 0.866;
+  clip-path: var(--forma-hex);
+  background: linear-gradient(160deg, #ffb15c, #ff7a1a 50%, #c2510c);
+  border: 0; padding: 0; margin: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #ffd9b0; font: 700 14px 'Segoe UI', system-ui, sans-serif; line-height: 1;
+  text-shadow: 0 0 6px rgba(255, 122, 26, 0.8);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.tactil-hex::before {
+  content: ''; position: absolute; z-index: -1;
+  inset: calc(var(--borde-hex) * 1.1547) var(--borde-hex);
+  clip-path: var(--forma-hex);
+  background: radial-gradient(circle at 50% 35%, rgba(60, 25, 4, 0.78), rgba(10, 4, 1, 0.82));
+  transition: background 0.12s ease;
+}
+.tactil-hex.activo::before, .tactil-hex[aria-pressed="true"]::before {
+  background: radial-gradient(circle at 50% 35%, rgba(255, 150, 50, 0.85), rgba(130, 50, 6, 0.9));
+}
+.tactil-hex[aria-pressed="true"], .tactil-hex.activo { color: #fff3e6; }
+.tactil-hex small { font-size: 8px; letter-spacing: 1px; }
+
+/* ── JOYSTICKS ── */
+.tactil-joystick { width: 128px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tactil-joystick-base { width: 100%; --borde-hex: 2.5px; }
+.tactil-joystick-base::before { background: radial-gradient(circle, rgba(40, 16, 2, 0.55), rgba(10, 4, 1, 0.7)); }
+.tactil-joystick-perilla {
+  position: absolute; left: 50%; top: 50%; width: 42%;
+  transform: translate(calc(-50% + var(--px, 0) * 36px), calc(-50% + var(--py, 0) * 36px));
+  pointer-events: none;
+}
+.tactil-joystick-perilla::before { background: radial-gradient(circle at 50% 35%, rgba(255, 150, 50, 0.7), rgba(120, 45, 5, 0.85)); }
+.tactil-etiqueta {
+  color: rgba(255, 177, 92, 0.75); font: 700 9px 'Segoe UI', system-ui, sans-serif; letter-spacing: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+#tactil-joystick-izquierdo { --x: max(22%, 130px); --y: 72%; }
+#tactil-joystick-derecho { --x: min(83%, calc(100% - 84px)); --y: 72%; }
+
+/* ── FLECHAS (cruz) Y PEDALES ── */
+.tactil-flechas {
+  --x: min(83%, calc(100% - 90px)); --y: 72%;
+  display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 54px); gap: 2px;
+}
+.tactil-flechas .tactil-hex { width: 52px; align-self: center; font-size: 16px; }
+.tactil-arriba { grid-area: 1 / 2; }
+.tactil-izquierda { grid-area: 2 / 1; }
+.tactil-derecha { grid-area: 2 / 3; }
+.tactil-abajo { grid-area: 3 / 2; }
+.tactil-pedales { --x: max(22%, 110px); --y: 80%; display: flex; gap: 4px; }
+.tactil-pedales .tactil-hex { width: 66px; }
+
+/* ── VELOCIDAD CONSTANTE: 1 2 / 3 4 / R1 R2 ── */
+.tactil-crucero {
+  --x: 46px; --y: 75%;
+  display: grid; grid-template-columns: repeat(2, 36px); gap: 2px 3px;
+}
+.tactil-pequeno { width: 36px; font-size: 12px; --borde-hex: 1.5px; }
+
+/* ── BOTÓN E ── */
+#btn-e {
+  position: fixed; /* .tactil-hex lo dejaría en relative */
+  --x: min(83%, calc(100% - 84px)); --y: 36%;
+  width: 64px; gap: 2px; font-size: 18px;
+}
+#btn-e span { font-size: 7px; letter-spacing: 1px; color: rgba(255, 210, 170, 0.7); }
+
+/* ── EDICIÓN DEL DISEÑO ("Personalizar HUD") ──
+   Por encima de la pantalla de personalización (45) para poder arrastrarlos. */
+body.personalizando-hud .tactil-control { z-index: 46; cursor: move; }
+body.personalizando-hud .tactil-joystick,
+body.personalizando-hud .tactil-grupo { outline: 1px dashed rgba(255, 200, 150, 0.55); outline-offset: 6px; }
+body.personalizando-hud .tactil-control.seleccionado { filter: brightness(1.35) drop-shadow(0 0 8px rgba(255, 122, 26, 0.9)); }
+body.personalizando-hud .tactil-joystick.seleccionado,
+body.personalizando-hud .tactil-grupo.seleccionado { outline: 2px solid #ffb15c; }
+
+/* En vertical no cabe al lado del joystick: va encima de él. */
+@media (orientation: portrait) {
+  .tactil-crucero { --y: 52%; }
+  #tactil-joystick-izquierdo { --x: max(22%, 84px); }
+}

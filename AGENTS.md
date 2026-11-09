@@ -45,6 +45,9 @@ navegador proporcional al área modificada.
 - `codigo/nave/controles-nave/`: panel de controles, persistencia y reasignación
   de teclas. Su estado se guarda en `localStorage` bajo
   `universo-config-controles`.
+- `codigo/nave/controles-tactiles/`: joysticks, flechas, velocidad constante y
+  botón E para móvil. Exporta el estado `tactil` que lee `nave.js` y la edición
+  de posición/tamaño que usa "Personalizar HUD".
 - `codigo/nave/mira/`: HUD de energía, velocidad y escalera de cabeceo.
 - `codigo/interfaz/`: HUD general, CV y reproductor de audio.
 - `codigo/interfaz-carga/`: pantalla y estado de carga inicial.
@@ -76,7 +79,7 @@ navegador proporcional al área modificada.
    geometría repetidamente desde el loop.
 7. Al retirar objetos dinámicos de Three.js, elimina listeners asociados y libera
    geometrías, materiales y texturas que sean propiedad del objeto.
-8. Los modos `estandar`, `medio` y `avanzado` son valores de contrato entre el
+8. Los modos `estandar`, `medio`, `avanzado` y `personalizado` son valores de contrato entre el
    panel, `nave.js` y `camara.js`. Si se añade o renombra uno, actualiza las tres
    capas y su persistencia.
 9. Usa `KeyboardEvent.code` para controles configurables. Conserva soporte de

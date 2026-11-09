@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/codigo/interfaz/estilos.css">
 <link rel="stylesheet" href="/codigo/nave/mira/estilos.css">
 <link rel="stylesheet" href="/codigo/nave/controles-nave/estilos.css">
+<link rel="stylesheet" href="/codigo/nave/controles-tactiles/estilos.css">
 <link rel="stylesheet" href="/codigo/editor/estilos.css">
 <link rel="stylesheet" href="/codigo/inicio_perfil/estilos.css">
 </head>
@@ -160,7 +161,7 @@
 
 <!-- Touch hint móvil -->
 <div id="touch-hint">
-  JOYSTICK ← mover &nbsp;|&nbsp; DRAG → → cámara
+  ARRASTRA LA PANTALLA → cámara &nbsp;|&nbsp; ⚙🎮 → controles
 </div>
 
 <div id="planet-hint">◈ PLANETA DETECTADO — HAZ CLICK ◈</div>
@@ -195,16 +196,41 @@
 </div>
 <audio id="bg-audio" preload="auto"></audio>
 
-<!-- Joystick móvil -->
-<div id="joystick-wrap">
-  <div id="joystick">
-    <div id="joystick-knob"></div>
+<!-- Controles táctiles (≤900 px). El esquema activo lo marca una clase en
+     <body>: controles-joysticks o controles-flechas. Cada [data-control] se puede
+     mover y escalar desde "Personalizar HUD". -->
+<div id="controles-tactiles">
+  <div class="tactil-control tactil-joystick" id="tactil-joystick-izquierdo" data-control="joystick-izquierdo" data-esquema="joysticks">
+    <div class="tactil-joystick-base tactil-hex"><div class="tactil-joystick-perilla tactil-hex"></div></div>
+    <span class="tactil-etiqueta">AVANCE</span>
   </div>
-  <div id="joystick-label">MOVER</div>
+  <div class="tactil-control tactil-joystick" id="tactil-joystick-derecho" data-control="joystick-derecho" data-esquema="joysticks">
+    <div class="tactil-joystick-base tactil-hex"><div class="tactil-joystick-perilla tactil-hex"></div></div>
+    <span class="tactil-etiqueta">DIRECCIÓN</span>
+  </div>
+  <div class="tactil-control tactil-grupo tactil-flechas" data-control="flechas" data-esquema="flechas">
+    <button class="tactil-hex tactil-arriba" type="button" data-accion="inclinar-arriba" aria-label="Inclinar hacia arriba">▲</button>
+    <button class="tactil-hex tactil-izquierda" type="button" data-accion="girar-izquierda" aria-label="Girar a la izquierda">◀</button>
+    <button class="tactil-hex tactil-derecha" type="button" data-accion="girar-derecha" aria-label="Girar a la derecha">▶</button>
+    <button class="tactil-hex tactil-abajo" type="button" data-accion="inclinar-abajo" aria-label="Inclinar hacia abajo">▼</button>
+  </div>
+  <div class="tactil-control tactil-grupo tactil-pedales" data-control="pedales" data-esquema="flechas">
+    <button class="tactil-hex " type="button" data-accion="acelerar"><small>ACELERAR</small></button>
+    <button class="tactil-hex " type="button" data-accion="frenar"><small>FRENAR</small></button>
+    <button class="tactil-hex " type="button" data-accion="retroceder"><small>RETRO</small></button>
+  </div>
+  <div class="tactil-control tactil-grupo tactil-crucero" data-control="crucero" role="group" aria-label="Velocidad constante">
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="0.25" aria-pressed="false">1</button>
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="0.5" aria-pressed="false">2</button>
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="0.75" aria-pressed="false">3</button>
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="1" aria-pressed="false">4</button>
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="-0.5" aria-pressed="false">R1</button>
+    <button class="tactil-hex tactil-pequeno" type="button" data-crucero="-1" aria-pressed="false">R2</button>
+  </div>
 </div>
 
-<!-- Botón E móvil -->
-<button id="btn-e" type="button">
+<!-- Botón E móvil (también se mueve y escala desde "Personalizar HUD") -->
+<button id="btn-e" class="tactil-control tactil-hex" data-control="boton-e" type="button">
   E<span>INTERACTUAR</span>
 </button>
 
@@ -235,6 +261,7 @@
       <button class="tab-controles active" data-modo="estandar">ESTÁNDAR</button>
       <button class="tab-controles" data-modo="medio">MEDIO<br><small>(ARCADE)</small></button>
       <button class="tab-controles" data-modo="avanzado">AVANZADO<br><small>(AS DE COMBATE)</small></button>
+      <button class="tab-controles" data-modo="personalizado">PERSONALIZADO<br><small>(TUS TECLAS)</small></button>
     </div>
 
     <div class="panel-controles-contenido">
@@ -278,18 +305,115 @@
         </div>
         <p class="tab-contenido-bloqueo">🔒 Solo para PC</p>
       </div>
+
+      <div class="tab-contenido" data-modo="personalizado" hidden>
+        <p class="tab-contenido-desc">Elige una tecla para cada acción: toca el botón y presiona la tecla. Si ya la usa otra acción, se intercambian. Esc cancela; E y R quedan reservadas.</p>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Acelerar</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="acelerar">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Frenar</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="frenar">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Retroceder</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="retroceder">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Girar a la izquierda</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="girarIzquierda">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Girar a la derecha</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="girarDerecha">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Inclinar hacia arriba</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="inclinarArriba">—</button>
+        </div>
+        <div class="rebind-grupo">
+          <span class="rebind-label">Inclinar hacia abajo</span>
+          <button class="rebind-tecla" type="button" data-tecla-accion="inclinarAbajo">—</button>
+        </div>
+        <div class="slider-grupo">
+          <label for="slider-sens-personalizado">Sensibilidad de giro</label>
+          <input type="range" id="slider-sens-personalizado" min="0.1" max="0.5" step="0.02" value="0.3">
+        </div>
+        <p class="tab-contenido-bloqueo">🔒 Solo para PC</p>
+      </div>
+    </div>
+
+    <div class="panel-controles-mira-config solo-movil">
+      <div class="panel-controles-seccion-titulo">// CONTROLES MÓVILES</div>
+      <div class="selector-esquema" role="radiogroup" aria-label="Esquema de controles táctiles">
+        <label><input type="radio" name="esquema-tactil" value="joysticks"><span>DOS JOYSTICKS</span></label>
+        <label><input type="radio" name="esquema-tactil" value="flechas"><span>FLECHAS Y BOTONES</span></label>
+      </div>
     </div>
 
     <div class="panel-controles-mira-config">
-      <div class="panel-controles-seccion-titulo">// MIRA</div>
+      <div class="panel-controles-seccion-titulo">// HUD</div>
+      <div class="interruptor-grupo">
+        <label for="hud-mira-toggle">Mira</label>
+        <input type="checkbox" role="switch" class="interruptor" id="hud-mira-toggle" checked>
+      </div>
+      <div class="interruptor-grupo">
+        <label for="hud-overlay-toggle">Overlay de inclinación</label>
+        <input type="checkbox" role="switch" class="interruptor" id="hud-overlay-toggle" checked>
+      </div>
+      <div class="interruptor-grupo">
+        <label for="hud-indicadores-toggle">Indicadores de energía y velocidad</label>
+        <input type="checkbox" role="switch" class="interruptor" id="hud-indicadores-toggle" checked>
+      </div>
+      <div class="interruptor-grupo">
+        <label for="hud-punto-fijo-toggle">Punto fijo del overlay</label>
+        <input type="checkbox" role="switch" class="interruptor" id="hud-punto-fijo-toggle">
+      </div>
+      <div class="slider-grupo">
+        <label for="hud-punto-fijo-select">Planeta de referencia</label>
+        <select id="hud-punto-fijo-select" class="selector-panel">
+          <option value="planeta-naranja">Planeta naranja</option>
+          <option value="planeta-morado">Planeta morado</option>
+        </select>
+      </div>
       <div class="slider-grupo">
         <label for="mira-color-input">Color</label>
         <input type="color" id="mira-color-input" value="#78c8ff">
       </div>
+      <button id="btn-personalizar-hud" class="boton-personalizar-hud" type="button">PERSONALIZAR HUD</button>
+    </div>
+  </div>
+</div>
+
+<!-- Personalizar HUD: el juego queda en pausa y el HUD se ve en vivo detrás -->
+<div id="personalizar-hud" role="dialog" aria-modal="true" aria-labelledby="personalizar-hud-titulo" hidden>
+  <div class="personalizar-hud-pausa">⏸ JUEGO EN PAUSA</div>
+  <div id="personalizar-hud-card">
+    <div id="personalizar-hud-titulo" class="panel-controles-titulo">// PERSONALIZAR HUD</div>
+    <div class="slider-grupo">
+      <label for="mira-tamano-input">Tamaño del HUD</label>
+      <input type="range" id="mira-tamano-input" min="0.6" max="1.6" step="0.05" value="1">
+    </div>
+    <div class="slider-grupo">
+      <label for="camara-distancia-input">Distancia de la cámara</label>
+      <input type="range" id="camara-distancia-input" min="9" max="32" step="0.5" value="15">
+    </div>
+    <div class="slider-grupo">
+      <label for="camara-altura-input">Altura de la cámara</label>
+      <input type="range" id="camara-altura-input" min="0" max="10" step="0.25" value="3">
+    </div>
+    <div class="personalizar-hud-tactil solo-movil">
+      <div class="panel-controles-seccion-titulo">// CONTROLES TÁCTILES</div>
+      <p class="tab-contenido-desc">Arrastra cualquier control para moverlo. Toca uno para cambiar su tamaño.</p>
       <div class="slider-grupo">
-        <label for="mira-tamano-input">Tamaño</label>
-        <input type="range" id="mira-tamano-input" min="0.6" max="1.6" step="0.05" value="1">
+        <label for="tactil-escala-input" id="tactil-escala-nombre">Ningún control seleccionado</label>
+        <input type="range" id="tactil-escala-input" min="0.6" max="1.8" step="0.05" value="1" disabled>
       </div>
+    </div>
+    <div class="personalizar-hud-acciones">
+      <button id="personalizar-hud-restablecer" class="rebind-tecla" type="button">RESTABLECER</button>
+      <button id="personalizar-hud-listo" class="rebind-tecla personalizar-hud-listo" type="button">LISTO</button>
     </div>
   </div>
 </div>

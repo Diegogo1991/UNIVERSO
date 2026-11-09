@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { scene, camera, renderer, clock } from './escena.js';
+import { scene, camera, renderer, clock, pausarReloj } from './escena.js';
 import { initLights } from './lights.js';
 import { cargarNave, setRaycastBlockers, shipGroup, actualizarNave,
   entradaEstaSuspendida, esEntradaTexto, setEntradaSuspendida, reposicionarNave } from './nave.js';
-import { fueArrastreCamara } from './camara.js';
+import { fueArrastreCamara, vistaPreviaCamara } from './camara.js';
 import { planet, PLANET_POS, asteroids, inicializarNaveSecundaria, actualizarUniversoInicial } from '../universos/universo-inicial/universo-inicial.js';
 import { sistemaPlanet, SYSTEM_PLANET_POS, entrarUniversoRosado, salirUniversoRosado, estaActivo, actualizarUniversoRosado } from '../universos/universo-rosado/comportamiento.js';
 import { actualizarTitileo } from '../universos/titileo-estrellas.js';
@@ -13,11 +13,19 @@ import { btnE } from '../interfaz/elementos.js';
 import { actualizarMira } from './mira/funciones.js';
 import { actualizarEscaleraCabeceo } from './mira/escalera-cabeceo.js';
 import { inicializarControlesNave } from './controles-nave/funciones.js';
+import { inicializarControlesTactiles } from './controles-tactiles/funciones.js';
 import { crearContenido } from '../contenido/objetos.js';
 import { cargarMundoLocal } from '../contenido/almacenamiento.js';
 import mundoBase from '../contenido/mundo-inicial.json';
 
-initLights(scene); inicializarControlesNave();
+// En pausa (personalizar HUD) el mundo se congela pero se sigue dibujando.
+let pausado = false;
+initLights(scene);
+inicializarControlesTactiles({ estaSuspendida: entradaEstaSuspendida });
+inicializarControlesNave({
+  pausar: valor => { pausado = valor; pausarReloj(valor); },
+  puntosFijos: { 'planeta-naranja': PLANET_POS, 'planeta-morado': SYSTEM_PLANET_POS }
+});
 let publicado = mundoBase;
 try { publicado = cargarMundoLocal('publicado', mundoBase); }
 catch (error) { mostrarMensajeTemporal('No se pudo abrir la versión local: ' + error.message, 7000); }
@@ -90,6 +98,12 @@ renderer.domElement.addEventListener('click', e => {
 const pista = document.getElementById('contenido-pista');
 function animate() {
   requestAnimationFrame(animate);
+  if (pausado) {
+    vistaPreviaCamara(shipGroup);
+    actualizarEscaleraCabeceo({ shipGroup });
+    renderer.render(scene, camera);
+    return;
+  }
   const t = clock.getElapsedTime();
   const vuelo = actualizarNave(t);
   actualizarTitileo(t); actualizarUniversoInicial(t); actualizarUniversoRosado(t);

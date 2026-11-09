@@ -3,6 +3,7 @@
 
 export const mira = document.getElementById('mira');               // contenedor raíz de toda la mira
 export const miraCentro = document.getElementById('mira-centro');   // marcador central (crosshair)
+export const indicadores = [...mira.querySelectorAll('.mira-escala')]; // ENERGÍA y VELOCIDAD
 
 // Escala izquierda: ENERGÍA (reemplaza el "ALT" de un HUD de caza real)
 export const energiaFill = document.getElementById('mira-energia-fill');   // barra que sube/baja según % de energía

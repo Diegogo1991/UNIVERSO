@@ -1,4 +1,4 @@
-import { energiaFill, energiaValor, velocidadFill, velocidadValor } from './elementos.js';
+import { miraCentro, indicadores, energiaFill, energiaValor, velocidadFill, velocidadValor } from './elementos.js';
 import { configurarEscaleraCabeceo } from './escalera-cabeceo.js';
 
 // Se llama una vez por frame desde el loop de render (main.js) para reflejar el
@@ -22,4 +22,12 @@ export function configurarMira({ color, tamano }) {
   if (color) document.documentElement.style.setProperty('--mira-color', color);
   if (tamano) document.documentElement.style.setProperty('--mira-escala', tamano);
   configurarEscaleraCabeceo({ color, tamano });
+}
+
+// Mostrar/ocultar cada parte del HUD. Se usa visibility (no display) para que
+// ocultar una parte no desplace a las demás dentro de #mira.
+export function configurarVisibilidadHud({ mira, indicadores: conIndicadores, overlay }) {
+  if (typeof mira === 'boolean') miraCentro.style.visibility = mira ? '' : 'hidden';
+  if (typeof conIndicadores === 'boolean') indicadores.forEach(el => { el.style.visibility = conIndicadores ? '' : 'hidden'; });
+  if (typeof overlay === 'boolean') configurarEscaleraCabeceo({ visible: overlay });
 }

@@ -30,7 +30,7 @@ body { touch-action: auto; }
 #editor button:disabled { opacity: 0.4; cursor: default; }
 .transformacion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 #editor .transformacion label { margin: 3px 0 8px; color: #95acb8; }
-body.editando #hud, body.editando #mira,body.editando #contenido-pista, body.editando #joystick-wrap, body.editando #btn-e, body.editando #touch-hint, body.editando #btn-config-controles, body.editando #barra-mundo, body.editando #audio-panel-toggle { display: none; }
+body.editando #hud, body.editando #mira,body.editando #contenido-pista, body.editando #controles-tactiles, body.editando #btn-e, body.editando #touch-hint, body.editando #btn-config-controles, body.editando #barra-mundo, body.editando #audio-panel-toggle { display: none; }
 #detalle-objeto { margin: auto; width: min(720px, 92vw); max-height: 88vh; overflow: auto; background: #0b1b29; border: 1px solid #467282; border-radius: 14px; color: #dcedf5; padding: 28px; font: 15px/1.7 'Segoe UI', sans-serif; touch-action: pan-y; }
 #detalle-objeto::backdrop { background: #000b; }
 #detalle-cerrar { float: right; background: transparent; color: #bdeafa; border: 0; padding: 4px 10px; cursor: pointer; }

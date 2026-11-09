@@ -31,3 +31,29 @@ export const botonRebindFrenar = document.getElementById('rebind-frenar');
 // importar la pestaña activa
 export const miraColorInput = document.getElementById('mira-color-input');
 export const miraTamanoInput = document.getElementById('mira-tamano-input');
+
+// Interruptores de visibilidad del HUD
+export const toggleMira = document.getElementById('hud-mira-toggle');
+export const toggleOverlay = document.getElementById('hud-overlay-toggle');
+export const toggleIndicadores = document.getElementById('hud-indicadores-toggle');
+
+// Pantalla "Personalizar HUD" (tamaño del HUD y posición de la cámara)
+export const botonPersonalizarHud = document.getElementById('btn-personalizar-hud');
+export const pantallaPersonalizar = document.getElementById('personalizar-hud');
+export const camaraDistanciaInput = document.getElementById('camara-distancia-input');
+export const camaraAlturaInput = document.getElementById('camara-altura-input');
+export const botonRestablecerHud = document.getElementById('personalizar-hud-restablecer');
+export const botonListoHud = document.getElementById('personalizar-hud-listo');
+
+// Modo Personalizado (PC): un botón de reasignación por acción
+export const botonesTeclaAccion = [...document.querySelectorAll('[data-tecla-accion]')];
+export const sliderSensPersonalizado = document.getElementById('slider-sens-personalizado');
+
+// Punto fijo del overlay (planeta de referencia)
+export const togglePuntoFijo = document.getElementById('hud-punto-fijo-toggle');
+export const selectPuntoFijo = document.getElementById('hud-punto-fijo-select');
+
+// Controles móviles: esquema y tamaño del control seleccionado en "Personalizar HUD"
+export const radiosEsquema = [...document.querySelectorAll('input[name="esquema-tactil"]')];
+export const tactilEscalaInput = document.getElementById('tactil-escala-input');
+export const tactilEscalaNombre = document.getElementById('tactil-escala-nombre');

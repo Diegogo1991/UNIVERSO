@@ -5,7 +5,15 @@ import { suavizado } from './simulacion.js';
 export const mouseLook = { active: false, yaw: 0, pitch: 0 };
 export const touchLook = { active: false };
 let sensibilidad = 0.3, bloqueada = false, pointer = null, arrastrado = false;
-let distancia = 15, reiniciar = true;
+// Posición de la cámara respecto a la nave (unidades del mundo). La rueda del
+// mouse también cambia la distancia dentro del mismo rango.
+export const CAMARA = { distanciaMin: 9, distanciaMax: 32, alturaMin: 0, alturaMax: 10 };
+let distancia = 15, altura = 3, reiniciar = true;
+// Desvío lateral pedido por el joystick izquierdo (-1..1): orbita la cámara
+// hasta DESVIO_MAXIMO radianes hacia ese lado, con suavizado.
+const DESVIO_MAXIMO = 0.45;
+let desvioObjetivo = 0, desvio = 0;
+export function setDesvioCamara(valor) { desvioObjetivo = valor; }
 let getRaycastBlockers = () => [];
 const ultimo = new THREE.Vector2(), inicio = new THREE.Vector2(), actual = new THREE.Vector2();
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -47,8 +55,19 @@ canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => {
   if (bloqueada) return;
   e.preventDefault();
-  distancia = THREE.MathUtils.clamp(distancia + e.deltaY * 0.01, 9, 32);
+  distancia = THREE.MathUtils.clamp(distancia + e.deltaY * 0.01, CAMARA.distanciaMin, CAMARA.distanciaMax);
 }, { passive: false });
+export function setPosicionCamara({ distancia: d, altura: a }) {
+  if (Number.isFinite(d)) distancia = THREE.MathUtils.clamp(d, CAMARA.distanciaMin, CAMARA.distanciaMax);
+  if (Number.isFinite(a)) altura = THREE.MathUtils.clamp(a, CAMARA.alturaMin, CAMARA.alturaMax);
+}
+// Con el juego en pausa: coloca la cámara al instante detrás de la nave, sin
+// suavizado ni giro libre, para previsualizar la posición configurada.
+export function vistaPreviaCamara(ship) {
+  orientacion.copy(ship.quaternion);
+  mouseLook.yaw = mouseLook.pitch = 0; desvio = 0;
+  colocar(ship);
+}
 export function actualizarCamara(ship, modo, dt = 1 / 60) {
   if (bloqueada) return;
   if (reiniciar) { orientacion.copy(ship.quaternion); reiniciar = false; }
@@ -56,8 +75,12 @@ export function actualizarCamara(ship, modo, dt = 1 / 60) {
   if (!mouseLook.active) {
     mouseLook.yaw *= Math.exp(-5 * dt); mouseLook.pitch *= Math.exp(-5 * dt);
   }
-  orbita.setFromEuler(euler.set(mouseLook.pitch, mouseLook.yaw, 0));
-  offset.set(0, 3, distancia).applyQuaternion(orbita).applyQuaternion(orientacion);
+  desvio += (desvioObjetivo - desvio) * suavizado(4, dt);
+  colocar(ship);
+}
+function colocar(ship) {
+  orbita.setFromEuler(euler.set(mouseLook.pitch, mouseLook.yaw + desvio * DESVIO_MAXIMO, 0));
+  offset.set(0, altura, distancia).applyQuaternion(orbita).applyQuaternion(orientacion);
   // Amortigua orientación, no posición: a alta velocidad la nave no alcanza la cámara.
   camera.position.copy(ship.position).add(offset);
   arriba.set(0, 1, 0).applyQuaternion(orientacion); camera.up.copy(arriba);
